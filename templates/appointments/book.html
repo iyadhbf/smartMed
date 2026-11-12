@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Prendre rendez-vous — SmartMed AI{% endblock %}
+{% block meta_description %}Choisissez un médecin et un créneau pour votre consultation SmartMed AI.{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/appointments.css' %}">{% endblock %}
+
+{% block content %}
+<section class="sm-page">
+  <div class="sm-container sm-container--narrow">
+    <div class="sm-page__head">
+      <p class="sm-eyebrow">Prise de rendez-vous</p>
+      <h1 class="sm-page__title">Prendre rendez-vous</h1>
+      {% if step == "slots" %}
+        <p class="sm-page__lead">Choisissez un créneau libre chez {{ doctor.display_name }}, {{ doctor.specialty.name }}.</p>
+      {% else %}
+        <p class="sm-page__lead">Choisissez d'abord une spécialité et un médecin.</p>
+      {% endif %}
+    </div>
+
+    {% if step == "choose" %}
+      <form
+        class="sm-form booking-form"
+        method="get"
+        action="{% url 'appointments:book_entry' %}"
+        data-booking-form
+        data-doctors-url="{% url 'doctors:api_list' %}"
+      >
+        <div class="sm-field">
+          <label class="sm-field__label" for="booking-specialty">Spécialité</label>
+          <select class="form-select" id="booking-specialty" name="specialty">
+            <option value="">Choisir une spécialité</option>
+            {% for item in specialties %}
+              <option value="{{ item.pk }}" {% if item.pk == selected_specialty %}selected{% endif %}>{{ item.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="sm-field">
+          <label class="sm-field__label" for="booking-doctor">Médecin</label>
+          <select class="form-select" id="booking-doctor" name="doctor">
+            <option value="">Choisir une spécialité d'abord</option>
+          </select>
+        </div>
+        <div class="sm-field">
+          <label class="sm-field__label" for="booking-date">Date souhaitée <span class="sm-field__optional">(facultatif)</span></label>
+          <input class="form-control" type="date" id="booking-date" name="date" value="{{ wanted_date }}">
+        </div>
+        <p class="booking-bar__status" data-booking-status role="status" aria-live="polite"></p>
+        <div class="sm-form__actions">
+          <button class="sm-btn sm-btn--primary" type="submit" data-booking-submit>Voir les créneaux</button>
+        </div>
+      </form>
+    {% else %}
+      <div class="booking-doctor-card">
+        <div>
+          <p class="booking-doctor-card__name">{{ doctor.display_name }}</p>
+          <p class="booking-doctor-card__meta">{{ doctor.specialty.name }} · {{ doctor.consultation_duration }} min par consultation</p>
+        </div>
+        <a class="sm-btn sm-btn--ghost" href="{% url 'appointments:book_entry' %}">Changer de médecin</a>
+      </div>
+
+      {% if slot_days %}
+        <form method="post" action="{% url 'appointments:book_entry' %}" class="booking-slots-form">
+          {% csrf_token %}
+          <input type="hidden" name="doctor" value="{{ doctor.pk }}">
+          <p class="booking-slots-form__count">{{ slot_count }} créneau{{ slot_count|pluralize:"x" }} libre{{ slot_count|pluralize:"s" }} sur 14 jours</p>
+          {% include "appointments/_slot_picker.html" with wanted_date=wanted_date required=True %}
+          <div class="sm-field booking-reason">
+            <label class="sm-field__label" for="booking-reason">Motif de la consultation <span class="sm-field__optional">(facultatif)</span></label>
+            <textarea class="form-control" id="booking-reason" name="reason" rows="3" maxlength="300"
+              placeholder="Décrivez brièvement la raison de votre visite (300 caractères maximum)."></textarea>
+          </div>
+          <div class="sm-form__actions">
+            <button class="sm-btn sm-btn--primary" type="submit">Confirmer ma demande</button>
+          </div>
+        </form>
+      {% else %}
+        <div class="sm-empty">
+          <i class="bi bi-calendar2-x" aria-hidden="true"></i>
+          <p>Aucun créneau libre sur les 14 prochains jours pour ce médecin.</p>
+          <a class="sm-btn sm-btn--ghost" href="{% url 'appointments:book_entry' %}">Choisir un autre médecin</a>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

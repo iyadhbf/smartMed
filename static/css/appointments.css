@@ -1,0 +1,204 @@
+/* Sprint 3 — booking flow, appointment lists, status pills */
+
+.sm-container--narrow {
+  max-width: 860px;
+}
+
+.sm-field__optional {
+  font-weight: 400;
+  color: var(--muted, #5b6a76);
+}
+
+/* Booking page ------------------------------------------------------- */
+
+.booking-form {
+  max-width: 520px;
+}
+
+.booking-doctor-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 18px 22px;
+  border: 1px solid var(--border, #d9e4ea);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.booking-doctor-card__name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.booking-doctor-card__meta {
+  margin: 4px 0 0;
+  color: var(--muted, #5b6a76);
+  font-size: 0.95rem;
+}
+
+.booking-slots-form__count {
+  margin: 0 0 18px;
+  font-weight: 600;
+  color: var(--muted, #5b6a76);
+}
+
+.slot-picker {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.slot-day {
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border, #d9e4ea);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.slot-day.is-wanted {
+  border-color: var(--primary, #0e7c86);
+  box-shadow: 0 0 0 1px var(--primary, #0e7c86);
+}
+
+.slot-day__legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 0;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.slot-day__legend .sm-pill {
+  margin-left: 8px;
+  font-size: 0.72rem;
+  text-transform: none;
+}
+
+.slot-day__times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.slot-chip {
+  position: relative;
+  margin: 0;
+}
+
+.slot-chip__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.slot-chip__time {
+  display: inline-block;
+  min-width: 76px;
+  padding: 8px 12px;
+  border: 1px solid var(--border, #d9e4ea);
+  border-radius: 999px;
+  background: #f4fbfc;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-align: center;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.slot-chip__input:focus-visible + .slot-chip__time {
+  outline: 2px solid var(--primary, #0e7c86);
+  outline-offset: 2px;
+}
+
+.slot-chip__input:hover + .slot-chip__time {
+  border-color: var(--primary, #0e7c86);
+  color: var(--primary, #0e7c86);
+}
+
+.slot-chip__input:checked + .slot-chip__time {
+  background: var(--primary, #0e7c86);
+  border-color: var(--primary, #0e7c86);
+  color: #fff;
+}
+
+.booking-reason {
+  max-width: 560px;
+}
+
+/* Appointment lists --------------------------------------------------- */
+
+.appt-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.appt-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border: 1px solid var(--border, #d9e4ea);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.appt-item__when {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 200px;
+}
+
+.appt-item__date {
+  font-weight: 700;
+}
+
+.appt-item__time {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted, #5b6a76);
+}
+
+.appt-item__who {
+  flex: 1 1 220px;
+}
+
+.appt-item__doctor {
+  margin: 0;
+  font-weight: 700;
+}
+
+.appt-item__meta {
+  margin: 2px 0 0;
+  color: var(--muted, #5b6a76);
+  font-size: 0.92rem;
+}
+
+.appt-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.appt-item__actions form {
+  margin: 0;
+}
+
+.appt-item__locked {
+  color: var(--muted, #5b6a76);
+  font-size: 0.85rem;
+}

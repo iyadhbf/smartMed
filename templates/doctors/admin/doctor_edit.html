@@ -1,0 +1,52 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Modifier {{ object.display_name }} — Administration — SmartMed AI{% endblock %}
+{% block meta_description %}Modification du profil professionnel d'un médecin SmartMed AI.{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link" href="{% url 'admin_dashboard' %}">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link is-active" href="{% url 'doctor_admin_list' %}" aria-current="page">
+    <i class="bi bi-person-badge" aria-hidden="true"></i> Médecins
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'specialty_admin_list' %}">
+    <i class="bi bi-heart-pulse" aria-hidden="true"></i> Spécialités
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Administration{% endblock %}
+{% block dash_title %}Modifier {{ object.display_name }}{% endblock %}
+{% block dash_lead %}Mettez à jour les informations professionnelles et les paramètres de consultation de ce médecin.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-panel">
+  <form class="sm-form" method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="sm-form__error" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="sm-form__row">
+      {% include "partials/_form_field.html" with field=form.first_name %}
+      {% include "partials/_form_field.html" with field=form.last_name %}
+    </div>
+    {% include "partials/_form_field.html" with field=form.email %}
+
+    <div class="sm-form__row">
+      {% include "partials/_form_field.html" with field=form.specialty %}
+      {% include "partials/_form_field.html" with field=form.professional_number %}
+    </div>
+    <div class="sm-form__row">
+      {% include "partials/_form_field.html" with field=form.consultation_duration %}
+      {% include "partials/_form_field.html" with field=form.photo %}
+    </div>
+    {% include "partials/_form_field.html" with field=form.bio %}
+
+    <div class="sm-form__actions">
+      <button class="sm-btn sm-btn--primary" type="submit">Enregistrer</button>
+      <a class="sm-btn sm-btn--ghost" href="{% url 'doctor_admin_list' %}">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

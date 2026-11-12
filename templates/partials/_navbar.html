@@ -1,0 +1,78 @@
+{% load static %}
+<header class="sm-nav">
+  <div class="sm-container">
+    <nav class="sm-nav__inner" aria-label="Navigation principale">
+      {% include "partials/_logo.html" %}
+
+      <div class="sm-nav__links">
+        <a class="sm-nav__link{% if request.resolver_match.url_name == 'home' %} is-active{% endif %}" href="{% url 'home' %}">Accueil</a>
+        <a class="sm-nav__link" href="{% url 'home' %}#services">Services</a>
+        <a class="sm-nav__link" href="{% url 'home' %}#departements">Départements</a>
+        <a class="sm-nav__link{% if request.resolver_match.url_name == 'doctor_directory' or request.resolver_match.url_name == 'doctor_public' %} is-active{% endif %}" href="{% url 'doctor_directory' %}">Médecins</a>
+        <a class="sm-nav__link" href="{% url 'home' %}#contact">Contact</a>
+      </div>
+
+      <div class="sm-nav__actions">
+        {% if user.is_authenticated %}
+          <details class="sm-user">
+            <summary class="sm-avatar" title="{{ user.full_name }}">{{ user.initials }}<span class="sm-visually-hidden">Menu de {{ user.full_name }}</span></summary>
+            <div class="sm-user__panel">
+              <p class="sm-user__name">{{ user.full_name }}</p>
+              <p class="sm-user__email">{{ user.email }}</p>
+              {% if user.is_admin_role %}
+                <a class="sm-user__link" href="{% url 'admin_dashboard' %}"><i class="bi bi-grid" aria-hidden="true"></i> Panneau d'administration</a>
+              {% elif user.is_doctor %}
+                <a class="sm-user__link" href="{% url 'doctor_dashboard' %}"><i class="bi bi-grid" aria-hidden="true"></i> Mon espace médecin</a>
+              {% else %}
+                <a class="sm-user__link" href="{% url 'patient_dashboard' %}"><i class="bi bi-grid" aria-hidden="true"></i> Mon espace patient</a>
+              {% endif %}
+              <a class="sm-user__link" href="{% url 'accounts:profile' %}"><i class="bi bi-person" aria-hidden="true"></i> Mon profil</a>
+              <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="sm-user__logout"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Se déconnecter</button>
+              </form>
+            </div>
+          </details>
+        {% else %}
+          <a class="sm-icon-btn sm-nav__login" href="{% url 'accounts:login' %}" aria-label="Se connecter" title="Se connecter">
+            <i class="bi bi-person" aria-hidden="true"></i>
+          </a>
+        {% endif %}
+
+        <a class="sm-btn sm-btn--primary sm-nav__cta" href="{% url 'appointments:book_entry' %}">Prendre rendez-vous</a>
+
+        <button class="sm-nav__toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="mobile-navigation" aria-label="Ouvrir le menu">
+          <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+      </div>
+    </nav>
+
+    <div class="sm-nav__mobile" id="mobile-navigation" hidden>
+      <a class="sm-nav__mobile-link" href="{% url 'home' %}">Accueil</a>
+      <a class="sm-nav__mobile-link" href="{% url 'home' %}#services">Services</a>
+      <a class="sm-nav__mobile-link" href="{% url 'home' %}#departements">Départements</a>
+      <a class="sm-nav__mobile-link" href="{% url 'home' %}#medecins">Médecins</a>
+      <a class="sm-nav__mobile-link" href="{% url 'home' %}#contact">Contact</a>
+      <div class="sm-nav__mobile-actions">
+        {% if user.is_authenticated %}
+          <p class="sm-nav__mobile-user">{{ user.full_name }}<span>{{ user.email }}</span></p>
+          {% if user.is_admin_role %}
+            <a class="sm-btn sm-btn--ghost sm-btn--block" href="{% url 'admin_dashboard' %}"><i class="bi bi-grid" aria-hidden="true"></i> Panneau d'administration</a>
+          {% elif user.is_doctor %}
+            <a class="sm-btn sm-btn--ghost sm-btn--block" href="{% url 'doctor_dashboard' %}"><i class="bi bi-grid" aria-hidden="true"></i> Mon espace médecin</a>
+          {% else %}
+            <a class="sm-btn sm-btn--ghost sm-btn--block" href="{% url 'patient_dashboard' %}"><i class="bi bi-grid" aria-hidden="true"></i> Mon espace patient</a>
+          {% endif %}
+          <a class="sm-btn sm-btn--ghost sm-btn--block" href="{% url 'accounts:profile' %}"><i class="bi bi-person" aria-hidden="true"></i> Mon profil</a>
+          <form method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="sm-btn sm-btn--ghost sm-btn--block"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Se déconnecter</button>
+          </form>
+        {% else %}
+          <a class="sm-btn sm-btn--ghost sm-btn--block" href="{% url 'accounts:login' %}"><i class="bi bi-person" aria-hidden="true"></i> Se connecter</a>
+        {% endif %}
+        <a class="sm-btn sm-btn--primary sm-btn--block" href="{% url 'appointments:book_entry' %}">Prendre rendez-vous</a>
+      </div>
+    </div>
+  </div>
+</header>

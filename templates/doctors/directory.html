@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Trouver un médecin — SmartMed AI{% endblock %}
+{% block meta_description %}Recherchez un médecin SmartMed AI par nom ou spécialité et consultez ses créneaux disponibles.{% endblock %}
+{% block body_class %}directory{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/home.css' %}">{% endblock %}
+
+{% block content %}
+<section class="sm-section sm-directory">
+  <div class="sm-container">
+    <header class="sm-page-head">
+      <p class="sm-eyebrow">Notre équipe médicale</p>
+      <h1 class="sm-page-head__title">Trouver un médecin</h1>
+      <p class="sm-page-head__lead">
+        Filtrez par spécialité ou recherchez un praticien par son nom, puis consultez ses créneaux disponibles.
+      </p>
+    </header>
+
+    <form class="sm-filter-bar" method="get" role="search" aria-label="Rechercher un médecin">
+      <div class="sm-filter-grid">
+        <div class="sm-field">
+          <label class="sm-field__label" for="doctor-search">Nom du médecin</label>
+          <input class="form-control" type="search" id="doctor-search" name="q" value="{{ query }}"
+                 placeholder="Ex. Ben Salah" autocomplete="off">
+        </div>
+        <div class="sm-field">
+          <label class="sm-field__label" for="doctor-specialty">Spécialité</label>
+          <select class="form-select" id="doctor-specialty" name="specialty">
+            <option value="">Toutes les spécialités</option>
+            {% for specialty in specialties %}
+              <option value="{{ specialty.slug }}"{% if selected_specialty == specialty.slug or selected_specialty == specialty.pk|stringformat:"s" %} selected{% endif %}>
+                {{ specialty.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="sm-filter-grid__actions">
+          <button class="sm-btn sm-btn--primary" type="submit">
+            <i class="bi bi-search" aria-hidden="true"></i> Rechercher
+          </button>
+          {% if query or selected_specialty %}
+            <a class="sm-btn sm-btn--ghost" href="{% url 'doctor_directory' %}">Réinitialiser</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+    <div class="sm-results-head">
+      <p class="sm-results-count" role="status">
+        {{ result_count }} médecin{{ result_count|pluralize }}
+        {% if selected_specialty_name %}en {{ selected_specialty_name }}{% endif %}
+        {% if query %}pour « {{ query }} »{% endif %}
+      </p>
+      {% if selected_specialty_name or query %}
+        <a class="sm-results-reset" href="{% url 'doctor_directory' %}">Voir toute l'équipe</a>
+      {% endif %}
+    </div>
+
+    {% if doctors %}
+      <div class="doctors__grid sm-doctor-grid">
+        {% for doctor in doctors %}
+          <article class="doctor-card">
+            <div class="doctor-card__head">
+              {% if doctor.photo %}
+                <img class="doctor-card__photo" src="{{ doctor.photo.url }}" alt="Portrait de {{ doctor.display_name }}" width="72" height="72" loading="lazy">
+              {% else %}
+                <span class="doctor-card__avatar" aria-hidden="true">{{ doctor.user.initials }}</span>
+              {% endif %}
+              <div>
+                <span class="sm-pill">{{ doctor.specialty.name }}</span>
+                <h2 class="doctor-card__name">
+                  <a class="sm-card-link" href="{% url 'doctor_public' doctor.pk %}">{{ doctor.display_name }}</a>
+                </h2>
+              </div>
+            </div>
+            <p class="doctor-card__bio">{{ doctor.bio|default:"Ce praticien n'a pas encore ajouté de présentation."|truncatewords:24 }}</p>
+            <p class="doctor-card__meta">
+              <i class="bi bi-clock" aria-hidden="true"></i> Consultation de {{ doctor.consultation_duration }} min
+            </p>
+            <a class="sm-btn sm-btn--ghost doctor-card__cta" href="{% url 'doctor_public' doctor.pk %}">
+              Voir le profil et les créneaux <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+          </article>
+        {% endfor %}
+      </div>
+
+      {% if is_paginated %}
+        <nav class="sm-pagination" aria-label="Pagination des médecins">
+          {% if page_obj.has_previous %}
+            <a class="sm-pagination__link" href="{% querystring page=page_obj.previous_page_number %}" rel="prev">
+              <i class="bi bi-arrow-left" aria-hidden="true"></i> Précédent
+            </a>
+          {% else %}
+            <span class="sm-pagination__link is-disabled" aria-disabled="true">
+              <i class="bi bi-arrow-left" aria-hidden="true"></i> Précédent
+            </span>
+          {% endif %}
+
+          <p class="sm-pagination__status">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+
+          {% if page_obj.has_next %}
+            <a class="sm-pagination__link" href="{% querystring page=page_obj.next_page_number %}" rel="next">
+              Suivant <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+          {% else %}
+            <span class="sm-pagination__link is-disabled" aria-disabled="true">
+              Suivant <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </span>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <div class="sm-empty sm-empty--page">
+        <i class="bi bi-person-x" aria-hidden="true"></i>
+        <p>Aucun médecin ne correspond à votre recherche.</p>
+        <a class="sm-btn sm-btn--ghost" href="{% url 'doctor_directory' %}">Effacer les filtres</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

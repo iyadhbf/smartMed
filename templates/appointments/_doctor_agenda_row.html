@@ -1,0 +1,29 @@
+<li class="appt-item">
+  <div class="appt-item__when">
+    <span class="appt-item__date">{{ appointment.date|date:"d/m/Y" }}</span>
+    <span class="appt-item__time">{{ appointment.start_time|time:"H:i" }}</span>
+    <span class="sm-pill sm-pill--{{ appointment.status }}">{{ appointment.get_status_display }}</span>
+  </div>
+  <div class="appt-item__who">
+    <p class="appt-item__doctor">{{ appointment.patient.full_name }}</p>
+    <p class="appt-item__meta">{% if appointment.reason %}{{ appointment.reason }}{% else %}Motif non précisé{% endif %}</p>
+  </div>
+  <div class="appt-item__actions">
+    {% if appointment.status == "pending" %}
+      <form method="post" action="{% url 'doctor_appointment_action' appointment.pk 'confirm' %}">
+        {% csrf_token %}
+        <button class="sm-btn sm-btn--primary sm-btn--small" type="submit">Confirmer</button>
+      </form>
+    {% endif %}
+    {% if appointment.status == "confirmed" %}
+      <form method="post" action="{% url 'doctor_appointment_action' appointment.pk 'complete' %}">
+        {% csrf_token %}
+        <button class="sm-btn sm-btn--ghost sm-btn--small" type="submit">Terminer</button>
+      </form>
+    {% endif %}
+    <form method="post" action="{% url 'doctor_appointment_action' appointment.pk 'cancel' %}" data-confirm-submit="Annuler ce rendez-vous ? Le créneau sera de nouveau libre.">
+      {% csrf_token %}
+      <button class="sm-btn sm-btn--danger sm-btn--small" type="submit">Annuler</button>
+    </form>
+  </div>
+</li>

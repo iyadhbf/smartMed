@@ -1,0 +1,10 @@
+Bonjour {{ patient.first_name }},
+
+Votre rendez-vous a été annulé.
+
+Médecin : {{ doctor.display_name }} ({{ doctor.specialty.name }})
+Date : {{ appointment.date|date:"l j F Y" }} à {{ appointment.start_time|time:"H:i" }}
+
+Vous pouvez choisir un nouveau créneau depuis votre espace personnel.
+
+SmartMed AI — message automatique, données de démonstration fictives.

@@ -1,0 +1,94 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Mes patients — SmartMed AI{% endblock %}
+{% block meta_description %}La liste de vos patients autorisés : ceux avec qui un rendez-vous non annulé vous lie.{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link" href="{% url 'doctor_dashboard' %}">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_agenda' %}">
+    <i class="bi bi-calendar2-week" aria-hidden="true"></i> Mes rendez-vous
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_availability' %}">
+    <i class="bi bi-clock-history" aria-hidden="true"></i> Mes disponibilités
+  </a>
+  <a class="sm-dash__nav-link is-active" href="{% url 'records:doctor_patients' %}" aria-current="page">
+    <i class="bi bi-people" aria-hidden="true"></i> Mes patients
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Espace médecin{% endblock %}
+{% block dash_title %}Mes patients{% endblock %}
+{% block dash_lead %}Patients avec qui un rendez-vous non annulé vous lie. Seuls leurs dossiers vous sont ouverts.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-panel sm-panel--wide">
+  <div class="sm-panel__head">
+    <h2 class="sm-panel__title">Patients autorisés</h2>
+    <span class="sm-pill">{{ paginator.count }} patient{{ paginator.count|pluralize }}</span>
+  </div>
+
+  <form class="sm-form sm-form--inline" method="get" action="{% url 'records:doctor_patients' %}">
+    <div class="sm-form__row">
+      <div class="sm-field">
+        <label class="sm-field__label" for="patient-q">Recherche</label>
+        <input class="form-control" type="search" id="patient-q" name="q" value="{{ query }}" placeholder="Nom, prénom ou e-mail">
+      </div>
+    </div>
+    <div class="sm-form__actions">
+      <button class="sm-btn sm-btn--primary" type="submit">Filtrer</button>
+      {% if query %}
+        <a class="sm-btn sm-btn--ghost" href="{% url 'records:doctor_patients' %}">Réinitialiser</a>
+      {% endif %}
+    </div>
+  </form>
+
+  {% if patients %}
+    <div class="sm-table-wrap">
+      <table class="sm-table">
+        <thead>
+          <tr>
+            <th scope="col">Patient</th>
+            <th scope="col">Date de naissance</th>
+            <th scope="col">Dossier</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for patient in patients %}
+            <tr>
+              <td>{{ patient.user.full_name }}</td>
+              <td>{{ patient.birth_date|date:"j F Y"|default:"—" }}</td>
+              <td>
+                <a class="sm-btn sm-btn--ghost sm-btn--small" href="{% url 'records:doctor_patient_record' patient.pk %}">
+                  <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i> Ouvrir
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if is_paginated %}
+      <nav class="sm-pagination" aria-label="Pagination des patients">
+        {% if page_obj.has_previous %}
+          <a class="sm-pagination__link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" rel="prev">Précédent</a>
+        {% else %}
+          <span class="sm-pagination__link is-disabled" aria-disabled="true">Précédent</span>
+        {% endif %}
+        <p class="sm-pagination__status">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+        {% if page_obj.has_next %}
+          <a class="sm-pagination__link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" rel="next">Suivant</a>
+        {% else %}
+          <span class="sm-pagination__link is-disabled" aria-disabled="true">Suivant</span>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="sm-empty">
+      <i class="bi bi-people" aria-hidden="true"></i>
+      <p>{% if query %}Aucun patient ne correspond à votre recherche.{% else %}Aucun patient autorisé pour le moment.{% endif %}</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

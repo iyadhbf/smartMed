@@ -1,0 +1,98 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Mon espace patient — SmartMed AI{% endblock %}
+{% block meta_description %}Votre espace patient SmartMed AI : profil, rendez-vous et assistant médical.{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/appointments.css' %}">{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link is-active" href="{% url 'patient_dashboard' %}" aria-current="page">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'appointments:appointment_list' %}">
+    <i class="bi bi-calendar2-week" aria-hidden="true"></i> Mes rendez-vous
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'appointments:book_entry' %}">
+    <i class="bi bi-calendar2-plus" aria-hidden="true"></i> Prendre rendez-vous
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'records:patient_record' %}">
+    <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i> Mon dossier médical
+  </a>
+  <span class="sm-dash__nav-link is-disabled" aria-disabled="true">
+    <i class="bi bi-stars" aria-hidden="true"></i> Assistant IA <span class="sm-pill">Bientôt</span>
+  </span>
+{% endblock %}
+
+{% block dash_eyebrow %}Espace patient{% endblock %}
+{% block dash_title %}Bonjour {{ user.first_name }}{% endblock %}
+{% block dash_lead %}Retrouvez votre profil et les prochaines étapes de votre parcours de soins.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-dash__grid">
+  <div class="sm-panel sm-panel--wide">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Vos prochains rendez-vous</h2>
+      <a class="sm-btn sm-btn--ghost sm-btn--small" href="{% url 'appointments:appointment_list' %}">Tout voir</a>
+    </div>
+    {% if upcoming_appointments %}
+      <ul class="appt-list">
+        {% for appointment in upcoming_appointments %}
+          <li class="appt-item">
+            <div class="appt-item__when">
+              <span class="appt-item__date">{{ appointment.date|date:"d/m/Y" }}</span>
+              <span class="appt-item__time">{{ appointment.start_time|time:"H:i" }}</span>
+              <span class="sm-pill sm-pill--{{ appointment.status }}">{{ appointment.get_status_display }}</span>
+            </div>
+            <div class="appt-item__who">
+              <p class="appt-item__doctor">{{ appointment.doctor.display_name }}</p>
+              <p class="appt-item__meta">{{ appointment.doctor.specialty.name }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      <p class="sm-panel__actions">
+        <a class="sm-btn sm-btn--primary" href="{% url 'appointments:book_entry' %}">Prendre rendez-vous</a>
+      </p>
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-calendar2-week" aria-hidden="true"></i>
+        <p>Aucun rendez-vous à venir.</p>
+        <a class="sm-btn sm-btn--primary" href="{% url 'appointments:book_entry' %}">Prendre rendez-vous</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Mon profil</h2>
+    </div>
+    <dl class="sm-detail-list">
+      <div>
+        <dt>Date de naissance</dt>
+        <dd>{{ profile.birth_date|date:"j F Y"|default:"Non renseignée" }}</dd>
+      </div>
+      <div>
+        <dt>Téléphone</dt>
+        <dd>{{ profile.phone|default:"Non renseigné" }}</dd>
+      </div>
+      <div>
+        <dt>Consentement</dt>
+        <dd>{% if profile.consent_given_at %}Recueilli{% else %}À confirmer{% endif %}</dd>
+      </div>
+    </dl>
+    <p class="sm-panel__actions">
+      <a class="sm-btn sm-btn--ghost" href="{% url 'accounts:profile' %}">Modifier mon profil</a>
+    </p>
+  </div>
+
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Assistant médical IA</h2>
+      <span class="sm-pill">Bientôt</span>
+    </div>
+    <p class="sm-panel__text">
+      L'assistant répondra à vos questions générales en citant ses sources. Il ne réalisera aucun diagnostic et ne délivrera aucune ordonnance.
+    </p>
+  </div>
+</div>
+{% endblock %}

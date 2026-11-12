@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un compte médecin — SmartMed AI{% endblock %}
+{% block meta_description %}Créez un compte professionnel pour un médecin de la plateforme SmartMed AI.{% endblock %}
+{% block body_class %}auth{% endblock %}
+
+{% block content %}
+<section class="sm-page sm-page--auth">
+  <div class="sm-container">
+    <div class="sm-auth sm-auth--wide">
+      <div class="sm-auth__card">
+        <div class="sm-auth__head">
+          <span class="sm-auth__icon" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
+          <h1 class="sm-auth__title">Créer un compte médecin</h1>
+          <p class="sm-auth__sub">Réservé à l'administration : les médecins ne peuvent pas s'inscrire eux-mêmes.</p>
+        </div>
+
+        <div class="sm-callout sm-callout--info">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          <p>Le compte est créé avec le rôle « Médecin ». Le professionnel pourra ensuite compléter sa présentation et gérer son planning.</p>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="sm-form__error" role="alert">
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+
+        <form class="sm-form" method="post" action="{% url 'doctor_create' %}">
+          {% csrf_token %}
+
+          <div class="sm-form__row">
+            {% include "partials/_form_field.html" with field=form.first_name %}
+            {% include "partials/_form_field.html" with field=form.last_name %}
+          </div>
+          {% include "partials/_form_field.html" with field=form.email %}
+          <div class="sm-form__row">
+            {% include "partials/_form_field.html" with field=form.specialty %}
+            {% include "partials/_form_field.html" with field=form.professional_number %}
+          </div>
+          <div class="sm-form__row">
+            {% include "partials/_form_field.html" with field=form.consultation_duration %}
+            {% include "partials/_form_field.html" with field=form.photo %}
+          </div>
+          {% include "partials/_form_field.html" with field=form.bio %}
+          <div class="sm-form__row">
+            {% include "partials/_form_field.html" with field=form.password1 %}
+            {% include "partials/_form_field.html" with field=form.password2 %}
+          </div>
+
+          <div class="sm-form__actions">
+            <button class="sm-btn sm-btn--primary" type="submit">
+              Créer le compte <i class="bi bi-check2" aria-hidden="true"></i>
+            </button>
+            <a class="sm-btn sm-btn--ghost" href="{% url 'admin_dashboard' %}">Annuler</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

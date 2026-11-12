@@ -1,0 +1,108 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Mon espace médecin — SmartMed AI{% endblock %}
+{% block meta_description %}Votre espace médecin SmartMed AI : profil professionnel, planning et patients.{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link is-active" href="{% url 'doctor_dashboard' %}" aria-current="page">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_agenda' %}">
+    <i class="bi bi-calendar2-week" aria-hidden="true"></i> Mes rendez-vous
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_availability' %}">
+    <i class="bi bi-calendar3" aria-hidden="true"></i> Mes disponibilités
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'records:doctor_patients' %}">
+    <i class="bi bi-people" aria-hidden="true"></i> Mes patients
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Espace médecin{% endblock %}
+{% block dash_title %}Bienvenue, Dr {{ user.last_name }}{% endblock %}
+{% block dash_lead %}Gérez votre présentation professionnelle, vos horaires et vos créneaux de consultation.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-dash__grid">
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Ma fiche professionnelle</h2>
+      {% if profile %}<span class="sm-pill">{{ profile.specialty.name }}</span>{% endif %}
+    </div>
+    {% if profile %}
+      <dl class="sm-detail-list">
+        <div>
+          <dt>Numéro professionnel</dt>
+          <dd>{{ profile.professional_number }}</dd>
+        </div>
+        <div>
+          <dt>Spécialité</dt>
+          <dd>{{ profile.specialty.name }}</dd>
+        </div>
+        <div>
+          <dt>Statut</dt>
+          <dd>{% if profile.is_active %}Actif{% else %}Inactif{% endif %}</dd>
+        </div>
+      </dl>
+      {% if profile.bio %}
+        <p class="sm-panel__text">{{ profile.bio }}</p>
+      {% else %}
+        <p class="sm-panel__text">Ajoutez une présentation pour aider les patients à mieux vous connaître.</p>
+      {% endif %}
+      <p class="sm-panel__actions">
+        <a class="sm-btn sm-btn--ghost" href="{% url 'accounts:profile' %}">Modifier ma présentation</a>
+      </p>
+    {% else %}
+      <div class="sm-form__error" role="alert">
+        <p>Votre profil professionnel n'est pas encore configuré. Contactez l'administration.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Planning hebdomadaire</h2>
+      <span class="sm-pill">{{ slot_count }} créneau{{ slot_count|pluralize:"x" }}</span>
+    </div>
+    {% if weekly_hours %}
+      <dl class="sm-detail-list">
+        {% for hours in weekly_hours %}
+          <div>
+            <dt>{{ hours.get_weekday_display }}</dt>
+            <dd>{{ hours.start_time|time:"H:i" }}–{{ hours.end_time|time:"H:i" }}</dd>
+          </div>
+        {% endfor %}
+      </dl>
+      <p class="sm-field__help">Les créneaux sont générés sur 30 jours et masquent vos exceptions.</p>
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-calendar3" aria-hidden="true"></i>
+        <p>Définissez vos horaires pour publier vos premiers créneaux.</p>
+      </div>
+    {% endif %}
+    <p class="sm-panel__actions">
+      <a class="sm-btn sm-btn--primary" href="{% url 'doctor_availability' %}">Gérer mes disponibilités</a>
+    </p>
+  </div>
+
+  <div class="sm-panel sm-panel--wide">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Rendez-vous du jour</h2>
+      <a class="sm-btn sm-btn--ghost sm-btn--small" href="{% url 'doctor_agenda' %}">Mon agenda</a>
+    </div>
+    <div class="sm-stat-grid">
+      <div class="sm-stat">
+        <p class="sm-stat__value">{{ today_count }}</p>
+        <p class="sm-stat__label">Rendez-vous aujourd'hui</p>
+      </div>
+      <div class="sm-stat">
+        <p class="sm-stat__value">{{ pending_count }}</p>
+        <p class="sm-stat__label">En attente de confirmation</p>
+      </div>
+    </div>
+    <p class="sm-panel__actions">
+      <a class="sm-btn sm-btn--primary" href="{% url 'doctor_agenda' %}">Voir mes rendez-vous</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Spécialités — Administration — SmartMed AI{% endblock %}
+{% block meta_description %}Gestion des spécialités médicales affichées sur le site SmartMed AI.{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link" href="{% url 'admin_dashboard' %}">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_admin_list' %}">
+    <i class="bi bi-person-badge" aria-hidden="true"></i> Médecins
+  </a>
+  <a class="sm-dash__nav-link is-active" href="{% url 'specialty_admin_list' %}" aria-current="page">
+    <i class="bi bi-heart-pulse" aria-hidden="true"></i> Spécialités
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'admin:index' %}">
+    <i class="bi bi-sliders" aria-hidden="true"></i> Administration Django
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Administration{% endblock %}
+{% block dash_title %}Spécialités{% endblock %}
+{% block dash_lead %}Ces spécialités alimentent la page d'accueil, la recherche de médecins et le formulaire de réservation.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-stack">
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Liste des spécialités</h2>
+      <a class="sm-btn sm-btn--primary" href="{% url 'specialty_create' %}">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> Nouvelle spécialité
+      </a>
+    </div>
+
+    <form class="sm-filter-bar sm-filter-bar--compact" method="get" role="search">
+      <div class="sm-filter-grid">
+        <div class="sm-field">
+          <label class="sm-field__label" for="specialty-search">Rechercher</label>
+          <input class="form-control" type="search" id="specialty-search" name="q" value="{{ query }}" placeholder="Nom ou description">
+        </div>
+        <div class="sm-field">
+          <label class="sm-field__label" for="specialty-status">Statut</label>
+          <select class="form-select" id="specialty-status" name="status">
+            <option value="">Tous</option>
+            <option value="active"{% if status == "active" %} selected{% endif %}>Actives</option>
+            <option value="inactive"{% if status == "inactive" %} selected{% endif %}>Désactivées</option>
+          </select>
+        </div>
+        <div class="sm-filter-grid__actions">
+          <button class="sm-btn sm-btn--primary" type="submit">Filtrer</button>
+          {% if query or status %}
+            <a class="sm-btn sm-btn--ghost" href="{% url 'specialty_admin_list' %}">Réinitialiser</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+    {% if specialties %}
+      <div class="sm-table-wrap">
+        <table class="sm-table">
+          <caption class="sm-visually-hidden">Spécialités médicales</caption>
+          <thead>
+            <tr>
+              <th scope="col">Spécialité</th>
+              <th scope="col">Icône</th>
+              <th scope="col">Réservation</th>
+              <th scope="col">Médecins</th>
+              <th scope="col">Statut</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for specialty in specialties %}
+              <tr>
+                <td>
+                  <strong>{{ specialty.name }}</strong>
+                  {% if specialty.description %}<span class="sm-table__sub">{{ specialty.description|truncatewords:12 }}</span>{% endif %}
+                </td>
+                <td><i class="bi bi-{{ specialty.icon }}" aria-hidden="true"></i> <span class="sm-table__sub">{{ specialty.get_icon_display }}</span></td>
+                <td>{% if specialty.is_bookable %}En ligne{% else %}Sur place{% endif %}</td>
+                <td>{{ specialty.doctor_count }}</td>
+                <td>
+                  {% if specialty.is_active %}
+                    <span class="sm-pill sm-pill--ok">Active</span>
+                  {% else %}
+                    <span class="sm-pill sm-pill--muted">Désactivée</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="sm-table__actions">
+                    <a class="sm-btn sm-btn--ghost sm-btn--small" href="{% url 'specialty_edit' specialty.pk %}">Modifier</a>
+                    <form method="post" action="{% url 'specialty_toggle_status' specialty.pk %}">
+                      {% csrf_token %}
+                      <button class="sm-btn sm-btn--ghost sm-btn--small" type="submit">
+                        {% if specialty.is_active %}Désactiver{% else %}Réactiver{% endif %}
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if is_paginated %}
+        <nav class="sm-pagination" aria-label="Pagination des spécialités">
+          {% if page_obj.has_previous %}
+            <a class="sm-pagination__link" href="{% querystring page=page_obj.previous_page_number %}">Précédent</a>
+          {% endif %}
+          <p class="sm-pagination__status">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+          {% if page_obj.has_next %}
+            <a class="sm-pagination__link" href="{% querystring page=page_obj.next_page_number %}">Suivant</a>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-heart-pulse" aria-hidden="true"></i>
+        <p>Aucune spécialité ne correspond à ces critères.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

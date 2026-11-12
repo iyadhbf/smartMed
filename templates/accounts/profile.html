@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Mon profil — SmartMed AI{% endblock %}
+{% block meta_description %}Consultez et mettez à jour les informations de votre compte SmartMed AI.{% endblock %}
+{% block body_class %}auth{% endblock %}
+
+{% block content %}
+<section class="sm-page sm-page--auth">
+  <div class="sm-container">
+    <div class="sm-auth sm-auth--wide">
+      <div class="sm-auth__card">
+        <div class="sm-profile__head">
+          <span class="sm-dash__avatar" aria-hidden="true">{{ user.initials }}</span>
+          <div>
+            <h1 class="sm-auth__title">Mon profil</h1>
+            <p class="sm-auth__sub">{{ user.email }} · <span class="sm-pill">{{ user.get_role_display }}</span></p>
+          </div>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="sm-form__error" role="alert">
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+
+        <form class="sm-form" method="post" action="{% url 'accounts:profile' %}">
+          {% csrf_token %}
+
+          <div class="sm-form__row">
+            {% include "partials/_form_field.html" with field=form.first_name %}
+            {% include "partials/_form_field.html" with field=form.last_name %}
+          </div>
+
+          <div class="sm-field">
+            <span class="sm-field__label">Adresse e-mail</span>
+            <p class="sm-readonly">{{ user.email }}</p>
+            <p class="sm-field__help">L'adresse e-mail sert d'identifiant de connexion et ne peut pas être modifiée ici.</p>
+          </div>
+
+          {% if user.is_patient %}
+            <div class="sm-form__row">
+              {% include "partials/_form_field.html" with field=form.birth_date %}
+              {% include "partials/_form_field.html" with field=form.phone %}
+            </div>
+
+            {% if profile.consent_given_at %}
+              <p class="sm-field__help">
+                Consentement à la politique de confidentialité recueilli le
+                {{ profile.consent_given_at|date:"j F Y" }}.
+              </p>
+            {% endif %}
+          {% elif user.is_doctor %}
+            {% if profile %}
+              <dl class="sm-detail-list">
+                <div>
+                  <dt>Spécialité</dt>
+                  <dd>{{ profile.specialty.name }}</dd>
+                </div>
+                <div>
+                  <dt>Numéro professionnel</dt>
+                  <dd>{{ profile.professional_number }}</dd>
+                </div>
+              </dl>
+              <p class="sm-field__help">
+                La spécialité et le numéro professionnel sont gérés par l'administration.
+              </p>
+            {% else %}
+              <div class="sm-form__error" role="alert">
+                <p>Votre profil professionnel est en cours de configuration. Contactez l'administration.</p>
+              </div>
+            {% endif %}
+            {% include "partials/_form_field.html" with field=form.bio %}
+          {% endif %}
+
+          <div class="sm-form__actions">
+            <button class="sm-btn sm-btn--primary" type="submit">
+              Enregistrer <i class="bi bi-check2" aria-hidden="true"></i>
+            </button>
+            <a class="sm-btn sm-btn--ghost" href="{% url 'accounts:password_change' %}">Changer mon mot de passe</a>
+          </div>
+        </form>
+
+        <p class="sm-auth__foot">
+          {% if user.is_admin_role %}
+            <a href="{% url 'admin_dashboard' %}">Retour au panneau d'administration</a>
+          {% elif user.is_doctor %}
+            <a href="{% url 'doctor_dashboard' %}">Retour à mon espace médecin</a>
+          {% else %}
+            <a href="{% url 'patient_dashboard' %}">Retour à mon espace patient</a>
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

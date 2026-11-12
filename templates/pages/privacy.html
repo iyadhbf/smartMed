@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Politique de confidentialité — SmartMed AI{% endblock %}
+{% block meta_description %}Comment SmartMed AI collecte, protège et limite l'accès aux données personnelles et de santé.{% endblock %}
+
+{% block content %}
+<section class="sm-page">
+  <div class="sm-container">
+    <div class="sm-page__head">
+      <p class="sm-eyebrow">Vos données, vos droits</p>
+      <h1 class="sm-page__title">Politique de confidentialité</h1>
+      <p class="sm-page__lead">SmartMed AI applique les principes de protection des données personnelles et de santé prévus par la réglementation tunisienne.</p>
+    </div>
+
+    <div class="sm-prose">
+      <p class="sm-prose__meta">Dernière mise à jour : {% now "F Y" %}</p>
+
+      <div class="sm-callout">
+        <strong>Plateforme de démonstration.</strong> Toutes les données de ce site sont fictives.
+        N'y saisissez jamais de données médicales réelles.
+      </div>
+
+      <h2>1. Responsable du traitement</h2>
+      <p>SmartMed AI est un projet académique développé dans le cadre du cours « Projet de développement ». Le responsable du traitement est l'équipe projet, joignable à <a href="mailto:contact@smartmed.test">contact@smartmed.test</a>.</p>
+
+      <h2>2. Données collectées</h2>
+      <ul>
+        <li>Données d'identification : nom, prénom, adresse e-mail, date de naissance, téléphone.</li>
+        <li>Données de rendez-vous : spécialité, médecin, date et heure, statut.</li>
+        <li>Données de santé : consultations, comptes rendus, prescriptions, antécédents, allergies et documents transmis.</li>
+        <li>Données d'usage : messages échangés avec l'assistant IA et journaux d'accès sensibles.</li>
+      </ul>
+
+      <h2>3. Finalités et base légale</h2>
+      <p>Ces données servent uniquement à gérer les rendez-vous, assurer le suivi médical, fournir l'assistance IA et produire des statistiques agrégées. Le traitement repose sur votre consentement, recueilli à l'inscription, et sur les obligations de soins applicables.</p>
+
+      <h2>4. Minimisation et accès</h2>
+      <ul>
+        <li>Chaque patient n'accède qu'à son propre dossier.</li>
+        <li>Un médecin n'accède qu'aux dossiers des patients qu'il est autorisé à suivre.</li>
+        <li>L'administrateur gère les comptes sans lire le contenu médical.</li>
+        <li>Les accès aux dossiers, documents et opérations sensibles sont journalisés.</li>
+      </ul>
+
+      <h2>5. Durée de conservation</h2>
+      <p>Dans ce projet de démonstration, les données sont conservées le temps de la présentation et peuvent être supprimées à tout moment. En production, les durées seraient définies conformément aux obligations légales applicables aux données de santé.</p>
+
+      <h2>6. Sécurité</h2>
+      <p>SmartMed AI met en œuvre une authentification, des contrôles d'accès côté serveur, la validation des fichiers téléversés, une protection CSRF, des cookies sécurisés en production et une journalisation des accès sensibles.</p>
+
+      <h2>7. Assistant IA</h2>
+      <p>L'assistant fournit uniquement des informations générales à partir de documents de référence. Il ne pose pas de diagnostic, ne prescrit pas de traitement et ne remplace pas une consultation. Ses réponses affichent leurs sources et un avertissement.</p>
+
+      <h2>8. Cookies</h2>
+      <p>Le site n'utilise que les cookies techniques nécessaires à la session et à la protection CSRF. Aucun cookie publicitaire ou de suivi n'est déposé.</p>
+
+      <h2>9. Vos droits</h2>
+      <p>Vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation et d'opposition. Pour l'exercer, écrivez à <a href="mailto:contact@smartmed.test">contact@smartmed.test</a>. Vous pouvez également saisir l'Instance nationale de protection des données personnelles (INPDP).</p>
+
+      <h2>10. Références</h2>
+      <p>Cette politique s'inspire de la loi organique n° 2004-63 du 27 juillet 2004 relative à la protection des données à caractère personnel et des principes de confidentialité applicables aux données de santé en Tunisie.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

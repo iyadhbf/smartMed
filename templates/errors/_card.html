@@ -1,0 +1,15 @@
+{% load static %}
+<section class="sm-error">
+  <div class="sm-container">
+    <div class="sm-error__card">
+      <span class="sm-error__badge" aria-hidden="true"><i class="bi bi-{{ icon }}"></i></span>
+      <span class="sm-error__code">{{ code }}</span>
+      <h1 class="sm-error__title">{{ title }}</h1>
+      <p class="sm-error__text">{{ message }}</p>
+      <div class="sm-error__actions">
+        <a class="sm-btn sm-btn--primary" href="{% url 'home' %}">Retour à l'accueil</a>
+        <a class="sm-btn sm-btn--ghost" href="mailto:contact@smartmed.test">Nous contacter</a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block body_class %}dashboard{% endblock %}
+
+{% block content %}
+<section class="sm-section sm-dash">
+  <div class="sm-container sm-dash__layout">
+    <aside class="sm-dash__aside" aria-label="Espace personnel">
+      <div class="sm-dash__identity">
+        <span class="sm-dash__avatar" aria-hidden="true">{{ user.initials }}</span>
+        <p class="sm-dash__name">{{ user.full_name }}</p>
+        <span class="sm-pill">{{ user.get_role_display }}</span>
+      </div>
+
+      <nav class="sm-dash__nav" aria-label="Navigation de l'espace personnel">
+        {% block sidebar_nav %}{% endblock %}
+      </nav>
+
+      <div class="sm-dash__aside-foot">
+        <a class="sm-dash__nav-link" href="{% url 'accounts:profile' %}">
+          <i class="bi bi-person-gear" aria-hidden="true"></i> Mon profil
+        </a>
+        <form method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}
+          <button class="sm-dash__nav-link" type="submit">
+            <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Se déconnecter
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <div class="sm-dash__main">
+      <header class="sm-dash__head">
+        <p class="sm-eyebrow">{% block dash_eyebrow %}Espace personnel{% endblock %}</p>
+        <h1 class="sm-dash__title">{% block dash_title %}{% endblock %}</h1>
+        <p class="sm-dash__lead">{% block dash_lead %}{% endblock %}</p>
+      </header>
+
+      {% block dash_content %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% endblock %}

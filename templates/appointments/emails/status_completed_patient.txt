@@ -1,0 +1,9 @@
+Bonjour {{ patient.first_name }},
+
+Votre consultation du {{ appointment.date|date:"l j F Y" }} à
+{{ appointment.start_time|time:"H:i" }} avec {{ doctor.display_name }} est terminée.
+
+Vos documents et comptes rendus seront disponibles dans votre espace personnel
+dès leur validation.
+
+SmartMed AI — message automatique, données de démonstration fictives.

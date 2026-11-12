@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mon dossier médical — SmartMed AI{% endblock %}
+{% block meta_description %}Votre dossier médical SmartMed AI : antécédents, allergies, consultations, ordonnances et documents partagés par vos médecins.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/records.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="sm-page">
+  <div class="sm-container">
+    <header class="sm-page__head">
+      <p class="sm-eyebrow">Dossier médical</p>
+      <h1>Mon dossier médical</h1>
+      <p class="sm-page__lead">
+        Informations partagées par vos médecins. SmartMed AI ne délivre aucun diagnostic ;
+        ces données sont fictives et servent uniquement à la démonstration.
+      </p>
+    </header>
+
+    <div class="sm-dash__grid">
+      <div class="sm-panel">
+        <div class="sm-panel__head">
+          <h2 class="sm-panel__title">Informations de santé</h2>
+        </div>
+        <dl class="sm-detail-list">
+          <div>
+            <dt>Antécédents</dt>
+            <dd>{{ record.history|default:"Aucun antécédent enregistré." }}</dd>
+          </div>
+          <div>
+            <dt>Allergies</dt>
+            <dd>{{ record.allergies|default:"Aucune allergie connue." }}</dd>
+          </div>
+          <div>
+            <dt>Traitements en cours</dt>
+            <dd>{{ record.treatments|default:"Aucun traitement en cours." }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="sm-panel sm-panel--wide">
+        <div class="sm-panel__head">
+          <h2 class="sm-panel__title">Mes consultations</h2>
+          <span class="sm-pill">{{ consultations|length }} consultation{{ consultations|length|pluralize }}</span>
+        </div>
+        {% if consultations %}
+          <ul class="record-list">
+            {% for consultation in consultations %}
+              <li class="record-item">
+                <div class="record-item__head">
+                  <p class="record-item__title">
+                    {{ consultation.occurred_at|date:"l j F Y à H:i" }}
+                  </p>
+                  <p class="record-item__meta">
+                    Dr {{ consultation.doctor.user.last_name }} — {{ consultation.doctor.specialty.name }}
+                  </p>
+                </div>
+                <div class="record-item__body">
+                  <p>{{ consultation.report|linebreaksbr }}</p>
+                </div>
+                {% for prescription in consultation.prescriptions.all %}
+                  <div class="record-prescription">
+                    <p class="record-prescription__title">
+                      <i class="bi bi-file-earmark-medical" aria-hidden="true"></i>
+                      Ordonnance du {{ prescription.issued_on|date:"j F Y" }}
+                    </p>
+                    <p>{{ prescription.content|linebreaksbr }}</p>
+                  </div>
+                {% endfor %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="sm-empty">
+            <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+            <p>Aucune consultation enregistrée pour le moment.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="sm-panel sm-panel--wide">
+        <div class="sm-panel__head">
+          <h2 class="sm-panel__title">Mes documents</h2>
+          <span class="sm-pill">{{ paginator.count }} document{{ paginator.count|pluralize }}</span>
+        </div>
+        {% if documents %}
+          <ul class="record-list record-list--documents">
+            {% for document in documents %}
+              <li class="record-doc">
+                <div class="record-doc__info">
+                  <p class="record-doc__name">
+                    <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+                    {{ document.display_name }}
+                  </p>
+                  <p class="record-doc__meta">
+                    {{ document.get_document_type_display }} · ajouté le {{ document.created_at|date:"j F Y" }}
+                  </p>
+                </div>
+                <a class="sm-btn sm-btn--ghost sm-btn--small" href="{% url 'records:document_download' document.pk %}">
+                  <i class="bi bi-download" aria-hidden="true"></i> Télécharger
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+          {% if is_paginated %}
+            <nav class="sm-pagination" aria-label="Pagination des documents">
+              {% if page_obj.has_previous %}
+                <a class="sm-pagination__link" href="?page={{ page_obj.previous_page_number }}" rel="prev">Précédent</a>
+              {% else %}
+                <span class="sm-pagination__link is-disabled" aria-disabled="true">Précédent</span>
+              {% endif %}
+              <p class="sm-pagination__status">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+              {% if page_obj.has_next %}
+                <a class="sm-pagination__link" href="?page={{ page_obj.next_page_number }}" rel="next">Suivant</a>
+              {% else %}
+                <span class="sm-pagination__link is-disabled" aria-disabled="true">Suivant</span>
+              {% endif %}
+            </nav>
+          {% endif %}
+        {% else %}
+          <div class="sm-empty">
+            <i class="bi bi-folder2-open" aria-hidden="true"></i>
+            <p>Aucun document n'a été partagé avec vous.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

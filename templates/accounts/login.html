@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion — SmartMed AI{% endblock %}
+{% block meta_description %}Connectez-vous à votre espace SmartMed AI pour gérer vos rendez-vous et consulter votre dossier médical.{% endblock %}
+{% block body_class %}auth{% endblock %}
+
+{% block content %}
+<section class="sm-page sm-page--auth">
+  <div class="sm-container">
+    <div class="sm-auth">
+      <div class="sm-auth__card">
+        <div class="sm-auth__head">
+          <span class="sm-auth__icon" aria-hidden="true"><i class="bi bi-person-check"></i></span>
+          <h1 class="sm-auth__title">Bon retour parmi nous</h1>
+          <p class="sm-auth__sub">Connectez-vous pour accéder à vos rendez-vous et à votre dossier médical.</p>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="sm-form__error" role="alert">
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+
+        <form class="sm-form" method="post" action="{% url 'accounts:login' %}">
+          {% csrf_token %}
+          {% include "partials/_form_field.html" with field=form.username %}
+          {% include "partials/_form_field.html" with field=form.password %}
+          <p class="sm-form__aside">
+            <a href="{% url 'accounts:password_reset' %}">Mot de passe oublié ?</a>
+          </p>
+          <input type="hidden" name="next" value="{{ next }}">
+          <button class="sm-btn sm-btn--primary sm-btn--block" type="submit">
+            Se connecter <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </button>
+        </form>
+
+        <p class="sm-auth__foot">
+          Pas encore de compte ?
+          <a href="{% url 'accounts:register' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Créer un compte patient</a><br>
+          <a href="{% url 'home' %}">Retour à l'accueil</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% load static %}
+<a class="sm-brand {{ brand_class|default:'' }}" href="{% url 'home' %}" aria-label="SmartMed AI — Accueil">
+  <img class="sm-brand__mark" src="{% static 'img/logo-mark.svg' %}" alt="" width="42" height="42">
+  <span class="sm-brand__text">
+    <span class="sm-brand__name">SmartMed <span class="sm-brand__ai">AI</span></span>
+    <span class="sm-brand__tag">Santé numérique</span>
+  </span>
+</a>

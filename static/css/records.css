@@ -1,0 +1,98 @@
+/* Medical record pages: consultation items, prescriptions, document rows. */
+
+.record-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.record-item {
+  border: 1px solid var(--sm-border, rgba(15, 107, 112, 0.14));
+  border-radius: var(--sm-radius, 14px);
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.record-item__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.record-item__title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--sm-ink, #123a3e);
+  text-transform: capitalize;
+}
+
+.record-item__meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--sm-muted, #52777b);
+}
+
+.record-item__body p {
+  margin: 0;
+  white-space: normal;
+}
+
+.record-prescription {
+  margin-top: 0.75rem;
+  border-left: 3px solid var(--sm-primary, #0f6b70);
+  padding: 0.5rem 0.9rem;
+  background: rgba(15, 107, 112, 0.06);
+  border-radius: 0 var(--sm-radius, 14px) var(--sm-radius, 14px) 0;
+}
+
+.record-prescription__title {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.record-prescription p:last-child {
+  margin-bottom: 0;
+}
+
+.record-list--documents {
+  gap: 0.6rem;
+}
+
+.record-doc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--sm-border, rgba(15, 107, 112, 0.14));
+  border-radius: var(--sm-radius, 14px);
+  padding: 0.65rem 1rem;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.record-doc__info {
+  min-width: 0;
+}
+
+.record-doc__name {
+  margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-wrap: anywhere;
+}
+
+.record-doc__meta {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: var(--sm-muted, #52777b);
+}

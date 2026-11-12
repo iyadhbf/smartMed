@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SmartMed AI — Votre santé, notre priorité{% endblock %}
+{% block meta_description %}Prenez rendez-vous en ligne, consultez votre dossier médical en toute sécurité et posez vos questions de santé à un assistant IA qui cite ses sources.{% endblock %}
+{% block body_class %}home{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/home.css' %}">{% endblock %}
+
+{% block content %}
+<section class="hero" id="accueil" aria-labelledby="hero-title">
+  <div class="sm-container">
+    <div class="hero__panel">
+      <img
+        class="hero__image"
+        src="{% static 'img/hero-consultation.jpg' %}"
+        alt="Un médecin échange avec une patiente dans une salle de consultation lumineuse"
+        width="1376" height="768" fetchpriority="high">
+      <div class="hero__overlay" aria-hidden="true"></div>
+
+      <div class="hero__content">
+        <p class="hero__eyebrow"><span class="hero__pulse" aria-hidden="true"></span> Prise de rendez-vous en ligne</p>
+        <h1 class="hero__title" id="hero-title">Votre santé,<br><span>notre priorité</span></h1>
+        <p class="hero__subtitle">Des soins attentifs pour vous et votre famille, réunis sur une seule plateforme.</p>
+        <ul class="hero__chips">
+          <li><i class="bi bi-calendar2-check" aria-hidden="true"></i> Rendez-vous en ligne</li>
+          <li><i class="bi bi-shield-check" aria-hidden="true"></i> Dossier sécurisé</li>
+          <li><i class="bi bi-stars" aria-hidden="true"></i> Assistant IA</li>
+        </ul>
+      </div>
+
+      <form class="booking-bar" action="{% url 'appointments:book_entry' %}" method="get"
+            data-booking-form data-doctors-url="{% url 'doctors:api_list' %}">
+        <div class="booking-bar__grid">
+          <div class="booking-field">
+            <label class="booking-field__label" for="booking-specialty">Département</label>
+            <div class="booking-field__control">
+              <select class="booking-field__input" id="booking-specialty" name="specialty" required>
+                <option value="">Choisir une spécialité</option>
+                {% for specialty in booking_specialties %}
+                  <option value="{{ specialty.pk }}">{{ specialty.name }}</option>
+                {% endfor %}
+              </select>
+              <i class="bi bi-chevron-down booking-field__icon" aria-hidden="true"></i>
+            </div>
+          </div>
+
+          <div class="booking-field">
+            <label class="booking-field__label" for="booking-doctor">Médecin</label>
+            <div class="booking-field__control">
+              <select class="booking-field__input" id="booking-doctor" name="doctor" required disabled>
+                <option value="">Choisir une spécialité d'abord</option>
+              </select>
+              <i class="bi bi-chevron-down booking-field__icon" aria-hidden="true"></i>
+            </div>
+          </div>
+
+          <div class="booking-field">
+            <label class="booking-field__label" for="booking-date">Date</label>
+            <div class="booking-field__control booking-field__control--date">
+              <input class="booking-field__input" type="date" id="booking-date" name="date" min="{{ today }}" required>
+            </div>
+          </div>
+
+          <button class="sm-btn sm-btn--primary booking-bar__submit" type="submit" data-booking-submit>
+            Réserver <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+        <p class="booking-bar__status" data-booking-status role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="sm-section departments" id="departements" aria-labelledby="departments-title">
+  <div class="sm-container">
+    <header class="sm-section__head sm-section__head--center">
+      <p class="sm-eyebrow">Nos spécialités</p>
+      <h2 class="sm-section__title" id="departments-title">Nos départements</h2>
+      <p class="sm-section__sub">Des équipes pluridisciplinaires réunies autour d'un même objectif : votre santé.</p>
+    </header>
+
+    {% if specialties %}
+      <div class="departments__grid">
+        {% for specialty in specialties %}
+          <article class="dept-card">
+            <span class="dept-card__icon" aria-hidden="true"><i class="bi bi-{{ specialty.icon }}"></i></span>
+            <h3 class="dept-card__name">{{ specialty.name }}</h3>
+            {% if not specialty.is_bookable %}
+              <p class="dept-card__note"><i class="bi bi-clock" aria-hidden="true"></i> 24 h / 24</p>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="sm-empty">Les spécialités seront bientôt disponibles.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="sm-section services" id="services" aria-labelledby="services-title">
+  <div class="sm-container">
+    <div class="sm-section__head sm-section__head--split">
+      <div>
+        <p class="sm-eyebrow">Ce que nous proposons</p>
+        <h2 class="sm-section__title" id="services-title">Services à la une</h2>
+        <p class="sm-section__sub">Des soins complets, du diagnostic au suivi, dans un cadre humain et sécurisé.</p>
+      </div>
+      <div class="carousel-nav" aria-label="Navigation du carrousel de services">
+        <button class="carousel-nav__btn" type="button" data-carousel-prev="#services-rail" aria-label="Services précédents">
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <button class="carousel-nav__btn" type="button" data-carousel-next="#services-rail" aria-label="Services suivants">
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sm-container sm-container--wide">
+    <div class="services__rail" id="services-rail" data-carousel tabindex="0" aria-label="Services à la une">
+      {% for service in services %}
+        <article class="service-card">
+          <div class="service-card__media">
+            <img src="{% static service.image %}" alt="{{ service.alt }}" width="1200" height="805" loading="lazy">
+            <span class="service-card__badge" aria-hidden="true"><i class="bi bi-{{ service.icon }}"></i></span>
+            <span class="service-card__arrow" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span>
+          </div>
+          <div class="service-card__body">
+            <h3>{{ service.title }}</h3>
+            <p>{{ service.description }}</p>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sm-section doctors" id="medecins" aria-labelledby="doctors-title">
+  <div class="sm-container">
+    <header class="sm-section__head sm-section__head--center">
+      <p class="sm-eyebrow">Une équipe à votre écoute</p>
+      <h2 class="sm-section__title" id="doctors-title">Nos médecins</h2>
+      <p class="sm-section__sub">Des praticiens expérimentés, disponibles pour vous conseiller et vous accompagner.</p>
+    </header>
+
+    {% if doctors %}
+      <div class="doctors__grid">
+        {% for doctor in doctors %}
+          <article class="doctor-card">
+            <div class="doctor-card__head">
+              {% if doctor.photo %}
+                <img class="doctor-card__photo" src="{{ doctor.photo.url }}" alt="Portrait de {{ doctor.display_name }}" width="72" height="72" loading="lazy">
+              {% else %}
+                <span class="doctor-card__avatar" aria-hidden="true">{{ doctor.user.initials }}</span>
+              {% endif %}
+              <div>
+                <span class="sm-pill">{{ doctor.specialty.name }}</span>
+                <h3 class="doctor-card__name">
+                  <a class="sm-card-link" href="{% url 'doctor_public' doctor.pk %}">{{ doctor.display_name }}</a>
+                </h3>
+              </div>
+            </div>
+            <p class="doctor-card__bio">{{ doctor.bio|truncatewords:24 }}</p>
+            <button class="sm-btn sm-btn--ghost doctor-card__cta" type="button"
+                    data-book-doctor="{{ doctor.pk }}" data-book-specialty="{{ doctor.specialty_id }}">
+              Prendre rendez-vous <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </button>
+          </article>
+        {% endfor %}
+      </div>
+      <p class="doctors__footer">
+        <a class="sm-btn sm-btn--primary" href="{% url 'doctor_directory' %}">
+          Voir tous les médecins <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
+      </p>
+    {% else %}
+      <p class="sm-empty">Notre équipe sera présentée prochainement.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="sm-section how" aria-labelledby="how-title">
+  <div class="sm-container">
+    <header class="sm-section__head sm-section__head--center">
+      <p class="sm-eyebrow">Simple et rapide</p>
+      <h2 class="sm-section__title" id="how-title">Comment ça marche</h2>
+      <p class="sm-section__sub">Trois étapes pour prendre soin de vous, sans complication.</p>
+    </header>
+
+    <div class="steps__grid">
+      {% for step in steps %}
+        <article class="step-card">
+          <span class="step-card__number" aria-hidden="true">{{ step.number }}</span>
+          <span class="step-card__icon" aria-hidden="true"><i class="bi bi-{{ step.icon }}"></i></span>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.text }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sm-section ai-section" id="assistant" aria-labelledby="assistant-title">
+  <div class="sm-container">
+    <div class="ai-panel">
+      <div class="ai-panel__copy">
+        <p class="sm-eyebrow sm-eyebrow--light">Assistant médical IA</p>
+        <h2 class="sm-section__title" id="assistant-title">Des réponses claires, toujours sourcées.</h2>
+        <p class="ai-panel__lead">
+          Posez vos questions de santé en langage naturel. L'assistant recherche d'abord dans une base
+          documentaire fiable, puis formule une réponse à partir des passages retrouvés.
+        </p>
+        <ul class="ai-panel__list">
+          <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Sources affichées pour chaque réponse</li>
+          <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Avertissement clair sur les limites de l'IA</li>
+          <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Orientation vers un médecin si nécessaire</li>
+          <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Détection des situations d'urgence</li>
+        </ul>
+        <p class="ai-panel__note">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          Information générale uniquement — ni diagnostic, ni prescription.
+        </p>
+      </div>
+
+      <div class="ai-chat" aria-hidden="true">
+        <div class="ai-chat__header">
+          <span class="ai-chat__bot"><i class="bi bi-robot"></i></span>
+          <div>
+            <p class="ai-chat__title">Assistant SmartMed</p>
+            <p class="ai-chat__status"><span></span> Démonstration</p>
+          </div>
+        </div>
+        <div class="ai-chat__body">
+          <p class="ai-bubble ai-bubble--user">Quels sont les symptômes courants du rhume ?</p>
+          <p class="ai-bubble ai-bubble--bot">Le rhume associe souvent un écoulement nasal, des éternuements, une gorge irritée et une légère fatigue. La plupart des cas guérissent en une semaine.</p>
+          <div class="ai-source">
+            <i class="bi bi-file-earmark-text"></i>
+            <div>
+              <p class="ai-source__label">Source utilisée</p>
+              <p class="ai-source__title">Fiche santé — Le rhume</p>
+            </div>
+          </div>
+          <p class="ai-disclaimer">Information générale. Ne remplace pas une consultation médicale.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sm-section contact" id="contact" aria-labelledby="contact-title">
+  <div class="sm-container">
+    <header class="sm-section__head sm-section__head--center">
+      <p class="sm-eyebrow">Nous sommes là</p>
+      <h2 class="sm-section__title" id="contact-title">Parlons de votre santé</h2>
+      <p class="sm-section__sub">Une question, un rendez-vous ? Notre équipe vous répond avec attention.</p>
+    </header>
+
+    <div class="contact__grid">
+      <div class="contact__info">
+        <ul class="contact-list">
+          <li>
+            <span class="contact-list__icon" aria-hidden="true"><i class="bi bi-geo-alt"></i></span>
+            <div><p class="contact-list__label">Adresse</p><p class="contact-list__value">12, avenue de la Santé<br>1002 Tunis, Tunisie</p></div>
+          </li>
+          <li>
+            <span class="contact-list__icon" aria-hidden="true"><i class="bi bi-telephone"></i></span>
+            <div><p class="contact-list__label">Téléphone</p><p class="contact-list__value"><a href="tel:+21671000000">+216 71 000 000</a></p></div>
+          </li>
+          <li>
+            <span class="contact-list__icon" aria-hidden="true"><i class="bi bi-envelope"></i></span>
+            <div><p class="contact-list__label">E-mail</p><p class="contact-list__value"><a href="mailto:contact@smartmed.test">contact@smartmed.test</a></p></div>
+          </li>
+          <li>
+            <span class="contact-list__icon" aria-hidden="true"><i class="bi bi-clock"></i></span>
+            <div><p class="contact-list__label">Horaires</p><p class="contact-list__value">Lun – Ven : 8 h – 18 h<br>Samedi : 8 h – 13 h</p></div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="contact__card">
+        <span class="contact__card-icon" aria-hidden="true"><i class="bi bi-calendar2-check"></i></span>
+        <h3>Un rendez-vous, en quelques clics</h3>
+        <p>Choisissez la spécialité, le médecin et la date qui vous conviennent. Le reste se passe dans votre espace sécurisé.</p>
+        <a class="sm-btn sm-btn--primary sm-btn--block" href="{% url 'appointments:book_entry' %}">Prendre rendez-vous <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        <p class="contact__hint"><i class="bi bi-shield-check" aria-hidden="true"></i> Vos données restent confidentielles.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

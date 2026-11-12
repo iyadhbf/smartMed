@@ -1,0 +1,121 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Patients — SmartMed AI{% endblock %}
+{% block meta_description %}Gestion des comptes patients SmartMed AI.{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link" href="{% url 'admin_dashboard' %}">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_admin_list' %}">
+    <i class="bi bi-person-badge" aria-hidden="true"></i> Médecins
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'patient_admin_list' %}" aria-current="page">
+    <i class="bi bi-people" aria-hidden="true"></i> Patients
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'specialty_admin_list' %}">
+    <i class="bi bi-heart-pulse" aria-hidden="true"></i> Spécialités
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_create' %}">
+    <i class="bi bi-person-plus" aria-hidden="true"></i> Créer un médecin
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Administration{% endblock %}
+{% block dash_title %}Patients{% endblock %}
+{% block dash_lead %}Comptes patients : recherche et activation. Aucune donnée médicale n'est affichée ici.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-panel sm-panel--wide">
+  <div class="sm-panel__head">
+    <h2 class="sm-panel__title">Comptes patients</h2>
+    <span class="sm-pill sm-pill--muted">{{ paginator.count }} compte{{ paginator.count|pluralize }}</span>
+  </div>
+
+  <form class="sm-form sm-form--inline" method="get">
+    <div class="sm-form__row">
+      <div class="sm-field">
+        <label class="sm-field__label" for="patient-q">Recherche</label>
+        <input class="form-control" type="search" id="patient-q" name="q" value="{{ query }}" placeholder="Nom, prénom ou e-mail">
+      </div>
+      <div class="sm-field">
+        <label class="sm-field__label" for="patient-status">Statut</label>
+        <select class="form-select" id="patient-status" name="status">
+          <option value="" {% if not status %}selected{% endif %}>Tous</option>
+          <option value="active" {% if status == "active" %}selected{% endif %}>Actifs</option>
+          <option value="inactive" {% if status == "inactive" %}selected{% endif %}>Désactivés</option>
+        </select>
+      </div>
+    </div>
+    <div class="sm-form__actions">
+      <button class="sm-btn sm-btn--primary" type="submit">Filtrer</button>
+      <a class="sm-btn sm-btn--ghost" href="{% url 'patient_admin_list' %}">Réinitialiser</a>
+    </div>
+  </form>
+
+  {% if patients %}
+    <div class="sm-table-wrap">
+      <table class="sm-table">
+        <caption class="sm-visually-hidden">Comptes patients</caption>
+        <thead>
+          <tr>
+            <th scope="col">Patient</th>
+            <th scope="col">E-mail</th>
+            <th scope="col">Inscription</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for patient in patients %}
+            <tr>
+              <td>{{ patient.full_name }}</td>
+              <td>{{ patient.email }}</td>
+              <td>{{ patient.date_joined|date:"d/m/Y" }}</td>
+              <td>
+                {% if patient.is_active %}
+                  <span class="sm-pill sm-pill--confirmed">Actif</span>
+                {% else %}
+                  <span class="sm-pill sm-pill--cancelled">Désactivé</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="post" action="{% url 'patient_toggle_status' patient.pk %}" data-confirm-submit="{% if patient.is_active %}Désactiver le compte de {{ patient.full_name }} ? Le patient ne pourra plus se connecter.{% else %}Réactiver le compte de {{ patient.full_name }} ?{% endif %}">
+                  {% csrf_token %}
+                  {% if patient.is_active %}
+                    <button class="sm-btn sm-btn--danger sm-btn--small" type="submit">Désactiver</button>
+                  {% else %}
+                    <button class="sm-btn sm-btn--ghost sm-btn--small" type="submit">Réactiver</button>
+                  {% endif %}
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if is_paginated %}
+      <nav class="sm-pagination" aria-label="Pagination des patients">
+        {% if page_obj.has_previous %}
+          <a class="sm-pagination__link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status %}&status={{ status }}{% endif %}" rel="prev">Précédent</a>
+        {% else %}
+          <span class="sm-pagination__link is-disabled" aria-disabled="true">Précédent</span>
+        {% endif %}
+        <p class="sm-pagination__status">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+        {% if page_obj.has_next %}
+          <a class="sm-pagination__link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status %}&status={{ status }}{% endif %}" rel="next">Suivant</a>
+        {% else %}
+          <span class="sm-pagination__link is-disabled" aria-disabled="true">Suivant</span>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="sm-empty">
+      <i class="bi bi-people" aria-hidden="true"></i>
+      <p>Aucun compte patient ne correspond à votre recherche.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

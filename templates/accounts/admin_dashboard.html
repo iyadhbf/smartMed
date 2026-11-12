@@ -1,0 +1,106 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Panneau d'administration — SmartMed AI{% endblock %}
+{% block meta_description %}Panneau d'administration SmartMed AI : comptes, médecins et journal d'audit.{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link is-active" href="{% url 'admin_dashboard' %}" aria-current="page">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_admin_list' %}">
+    <i class="bi bi-person-badge" aria-hidden="true"></i> Médecins
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'patient_admin_list' %}">
+    <i class="bi bi-people" aria-hidden="true"></i> Patients
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'specialty_admin_list' %}">
+    <i class="bi bi-heart-pulse" aria-hidden="true"></i> Spécialités
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_create' %}">
+    <i class="bi bi-person-plus" aria-hidden="true"></i> Créer un médecin
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'admin:index' %}">
+    <i class="bi bi-sliders" aria-hidden="true"></i> Administration Django
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Administration{% endblock %}
+{% block dash_title %}Panneau d'administration{% endblock %}
+{% block dash_lead %}Gérez les comptes de la plateforme et surveillez les opérations sensibles.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-stack">
+  <div class="sm-stat-grid">
+    <div class="sm-stat">
+      <p class="sm-stat__value">{{ patient_count }}</p>
+      <p class="sm-stat__label">Patients inscrits</p>
+    </div>
+    <div class="sm-stat">
+      <p class="sm-stat__value">{{ doctor_count }}</p>
+      <p class="sm-stat__label">Médecins actifs</p>
+    </div>
+    <div class="sm-stat">
+      <p class="sm-stat__value">{{ specialty_count }}</p>
+      <p class="sm-stat__label">Spécialités actives</p>
+    </div>
+  </div>
+
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Actions rapides</h2>
+    </div>
+    <div class="sm-quick-actions">
+      <a class="sm-btn sm-btn--primary" href="{% url 'doctor_admin_list' %}">
+        <i class="bi bi-person-badge" aria-hidden="true"></i> Gérer les médecins
+      </a>
+      <a class="sm-btn sm-btn--ghost" href="{% url 'specialty_admin_list' %}">
+        <i class="bi bi-heart-pulse" aria-hidden="true"></i> Gérer les spécialités
+      </a>
+      <a class="sm-btn sm-btn--ghost" href="{% url 'admin:index' %}">
+        <i class="bi bi-sliders" aria-hidden="true"></i> Administration Django
+      </a>
+    </div>
+    <p class="sm-field__help">
+      Les médecins ne peuvent pas s'inscrire eux-mêmes. Leur compte est créé ici, avec un profil professionnel.
+    </p>
+  </div>
+
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Journal d'audit</h2>
+      <span class="sm-pill">{{ audit_count }} entrée{{ audit_count|pluralize }}</span>
+    </div>
+    {% if audit_events %}
+      <div class="sm-table-wrap">
+        <table class="sm-table">
+          <caption class="sm-visually-hidden">Dernières opérations sensibles enregistrées</caption>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Événement</th>
+              <th scope="col">Auteur</th>
+              <th scope="col">Adresse IP</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in audit_events %}
+              <tr>
+                <td>{{ entry.created_at|date:"d/m/Y H:i" }}</td>
+                <td>{{ entry.get_event_display }}</td>
+                <td>{{ entry.actor_label }}</td>
+                <td>{{ entry.ip_address|default:"—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="sm-field__help">Le journal est en lecture seule et ne peut pas être modifié depuis l'interface.</p>
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-journal-text" aria-hidden="true"></i>
+        <p>Aucune opération sensible enregistrée pour le moment.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

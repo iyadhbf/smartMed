@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block title %}Erreur serveur — SmartMed AI{% endblock %}
+
+{% block content %}
+  {% include "errors/_card.html" with code="500" icon="exclamation-triangle" title="Une erreur est survenue" message="Un problème inattendu a interrompu votre demande. Réessayez dans quelques instants ; si le problème persiste, contactez l'administrateur." %}
+{% endblock %}

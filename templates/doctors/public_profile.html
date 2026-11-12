@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ doctor.display_name }} — {{ doctor.specialty.name }} — SmartMed AI{% endblock %}
+{% block meta_description %}Profil de {{ doctor.display_name }}, {{ doctor.specialty.name }} chez SmartMed AI. Consultez ses créneaux disponibles.{% endblock %}
+{% block body_class %}directory{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/home.css' %}">{% endblock %}
+
+{% block content %}
+<section class="sm-section sm-doctor-profile">
+  <div class="sm-container">
+    <nav class="sm-breadcrumb" aria-label="Fil d'Ariane">
+      <a href="{% url 'doctor_directory' %}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Tous les médecins</a>
+    </nav>
+
+    <article class="sm-profile-hero">
+      {% if doctor.photo %}
+        <img class="sm-profile-hero__photo" src="{{ doctor.photo.url }}" alt="Portrait de {{ doctor.display_name }}" width="132" height="132">
+      {% else %}
+        <span class="sm-profile-hero__avatar" aria-hidden="true">{{ doctor.user.initials }}</span>
+      {% endif %}
+      <div class="sm-profile-hero__body">
+        <p class="sm-eyebrow">{{ doctor.specialty.name }}</p>
+        <h1 class="sm-page-head__title">{{ doctor.display_name }}</h1>
+        <dl class="sm-profile-facts">
+          <div>
+            <dt>Spécialité</dt>
+            <dd>{{ doctor.specialty.name }}</dd>
+          </div>
+          <div>
+            <dt>N° professionnel</dt>
+            <dd>{{ doctor.professional_number }}</dd>
+          </div>
+          <div>
+            <dt>Durée de consultation</dt>
+            <dd>{{ doctor.consultation_duration }} minutes</dd>
+          </div>
+        </dl>
+        {% if doctor.bio %}
+          <p class="sm-profile-hero__bio">{{ doctor.bio }}</p>
+        {% endif %}
+      </div>
+    </article>
+
+    <section class="sm-panel sm-slots-panel" aria-labelledby="slots-title">
+      <div class="sm-panel__head">
+        <div>
+          <h2 class="sm-panel__title" id="slots-title">Créneaux disponibles</h2>
+          <p class="sm-panel__text">Les 14 prochains jours, hors exceptions du médecin.</p>
+        </div>
+        <span class="sm-pill">{{ slot_count }} créneau{{ slot_count|pluralize:"x" }}</span>
+      </div>
+
+      {% if slot_days %}
+        <div class="sm-slot-groups">
+          {% for day in slot_days %}
+            <div class="sm-slot-day">
+              <h3 class="sm-slot-day__title">{{ day.label }}</h3>
+              <ul class="sm-slot-list">
+                {% for slot in day.slots %}
+                  <li class="sm-slot">{{ slot.start_time|time:"H:i" }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        </div>
+        <p class="sm-panel__actions">
+          <a class="sm-btn sm-btn--primary" href="{% url 'appointments:book_entry' %}?doctor={{ doctor.pk }}">
+            Prendre rendez-vous <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+        </p>
+        <div class="sm-callout sm-callout--info">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          <p>Connectez-vous pour réserver l'un de ces créneaux en ligne.</p>
+        </div>
+      {% else %}
+        <div class="sm-empty">
+          <i class="bi bi-calendar-x" aria-hidden="true"></i>
+          <p>Aucun créneau n'est publié pour les deux prochaines semaines.</p>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,67 @@
+<footer class="sm-footer">
+  <div class="sm-container">
+    <div class="sm-footer__grid">
+      <div class="sm-footer__brand">
+        {% include "partials/_logo.html" with brand_class="sm-brand--footer" %}
+        <p class="sm-footer__tagline">La santé, plus simple et plus proche. Une plateforme de démonstration académique, avec des données fictives.</p>
+      </div>
+
+      <nav aria-labelledby="footer-nav-title">
+        <h2 class="sm-footer__title" id="footer-nav-title">Navigation</h2>
+        <ul class="sm-footer__list">
+          <li><a href="{% url 'home' %}">Accueil</a></li>
+          <li><a href="{% url 'home' %}#departements">Départements</a></li>
+          <li><a href="{% url 'home' %}#services">Services</a></li>
+          <li><a href="{% url 'home' %}#medecins">Médecins</a></li>
+          <li><a href="{% url 'home' %}#assistant">Assistant IA</a></li>
+        </ul>
+      </nav>
+
+      <nav aria-labelledby="footer-account-title">
+        <h2 class="sm-footer__title" id="footer-account-title">Espace patient</h2>
+        <ul class="sm-footer__list">
+          {% if user.is_authenticated %}
+            <li><span>{{ user.full_name }}</span></li>
+            <li>
+              {% if user.is_admin_role %}
+                <a href="{% url 'admin_dashboard' %}">Panneau d'administration</a>
+              {% elif user.is_doctor %}
+                <a href="{% url 'doctor_dashboard' %}">Mon espace médecin</a>
+              {% else %}
+                <a href="{% url 'patient_dashboard' %}">Mon espace patient</a>
+              {% endif %}
+            </li>
+            <li><a href="{% url 'accounts:profile' %}">Mon profil</a></li>
+          {% else %}
+            <li><a href="{% url 'accounts:login' %}">Se connecter</a></li>
+            <li><a href="{% url 'accounts:register' %}">Créer un compte</a></li>
+          {% endif %}
+          <li><a href="{% url 'appointments:book_entry' %}">Prendre rendez-vous</a></li>
+          <li><a href="{% url 'home' %}#contact">Nous contacter</a></li>
+        </ul>
+      </nav>
+
+      <div>
+        <h2 class="sm-footer__title">Contact</h2>
+        <ul class="sm-footer__list sm-footer__contact">
+          <li><i class="bi bi-geo-alt" aria-hidden="true"></i><span>12, avenue de la Santé<br>1002 Tunis, Tunisie</span></li>
+          <li><i class="bi bi-telephone" aria-hidden="true"></i><a href="tel:+21671000000">+216 71 000 000</a></li>
+          <li><i class="bi bi-envelope" aria-hidden="true"></i><a href="mailto:contact@smartmed.test">contact@smartmed.test</a></li>
+        </ul>
+      </div>
+
+      <nav aria-labelledby="footer-legal-title">
+        <h2 class="sm-footer__title" id="footer-legal-title">Informations</h2>
+        <ul class="sm-footer__list">
+          <li><a href="{% url 'privacy' %}">Confidentialité</a></li>
+          <li><a href="{% url 'legal' %}">Mentions légales</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="sm-footer__bottom">
+      <p>© {% now "Y" %} SmartMed AI. Tous droits réservés.</p>
+      <p>Projet de développement — données de démonstration fictives.</p>
+    </div>
+  </div>
+</footer>

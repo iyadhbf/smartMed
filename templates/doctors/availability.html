@@ -1,0 +1,224 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Mes disponibilités — SmartMed AI{% endblock %}
+{% block meta_description %}Définissez vos horaires hebdomadaires et vos exceptions de disponibilité.{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link" href="{% url 'doctor_dashboard' %}">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link is-active" href="{% url 'doctor_availability' %}" aria-current="page">
+    <i class="bi bi-calendar3" aria-hidden="true"></i> Mes disponibilités
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Espace médecin{% endblock %}
+{% block dash_title %}Mes disponibilités{% endblock %}
+{% block dash_lead %}Définissez vos horaires récurrents et vos exceptions. Les créneaux sont générés automatiquement sur 30 jours.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-stack">
+  <div class="sm-stat-grid">
+    <div class="sm-stat">
+      <p class="sm-stat__value">{{ weekly_count }}</p>
+      <p class="sm-stat__label">Plages hebdomadaires actives</p>
+    </div>
+    <div class="sm-stat">
+      <p class="sm-stat__value">{{ slot_count }}</p>
+      <p class="sm-stat__label">Créneaux à venir</p>
+    </div>
+    <div class="sm-stat">
+      <p class="sm-stat__value">{{ profile.consultation_duration }} min</p>
+      <p class="sm-stat__label">Durée d'une consultation</p>
+    </div>
+  </div>
+
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <div>
+        <h2 class="sm-panel__title">Horaires hebdomadaires</h2>
+        <p class="sm-panel__text">Ajoutez une plage par ligne. Les plages d'un même jour ne peuvent pas se chevaucher.</p>
+      </div>
+      <button class="sm-btn sm-btn--ghost" type="button" id="add-schedule-row">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> Ajouter une plage
+      </button>
+    </div>
+
+    <form method="post" novalidate id="schedule-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="hours">
+      {{ formset.management_form }}
+
+      {% if formset.non_form_errors %}
+        <div class="sm-form__error" role="alert">{{ formset.non_form_errors }}</div>
+      {% endif %}
+
+      <div class="sm-table-wrap">
+        <table class="sm-table sm-schedule-table">
+          <caption class="sm-visually-hidden">Plages horaires hebdomadaires</caption>
+          <thead>
+            <tr>
+              <th scope="col">Jour</th>
+              <th scope="col">Début</th>
+              <th scope="col">Fin</th>
+              <th scope="col">Active</th>
+              <th scope="col">Supprimer</th>
+            </tr>
+          </thead>
+          <tbody id="schedule-rows">
+            {% for form in formset %}
+              <tr>
+                <td>
+                  <label class="sm-visually-hidden" for="{{ form.weekday.id_for_label }}">Jour</label>
+                  {{ form.weekday }}
+                  {% for error in form.weekday.errors %}<p class="sm-field__error">{{ error }}</p>{% endfor %}
+                </td>
+                <td>
+                  <label class="sm-visually-hidden" for="{{ form.start_time.id_for_label }}">Heure de début</label>
+                  {{ form.start_time }}
+                  {% for error in form.start_time.errors %}<p class="sm-field__error">{{ error }}</p>{% endfor %}
+                </td>
+                <td>
+                  <label class="sm-visually-hidden" for="{{ form.end_time.id_for_label }}">Heure de fin</label>
+                  {{ form.end_time }}
+                  {% for error in form.end_time.errors %}<p class="sm-field__error">{{ error }}</p>{% endfor %}
+                </td>
+                <td>
+                  <label class="sm-check sm-check--compact" for="{{ form.is_active.id_for_label }}">
+                    {{ form.is_active }}
+                    <span class="sm-visually-hidden">Plage active</span>
+                  </label>
+                </td>
+                <td>
+                  {% if form.instance.pk %}
+                    <label class="sm-check sm-check--compact" for="{{ form.DELETE.id_for_label }}">
+                      {{ form.DELETE }}
+                      <span>Supprimer</span>
+                    </label>
+                  {% endif %}
+                  {{ form.id }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sm-form__actions">
+        <button class="sm-btn sm-btn--primary" type="submit">Enregistrer les horaires</button>
+      </div>
+    </form>
+
+    <template id="empty-schedule-row">
+      <tr>
+        <td>
+          <label class="sm-visually-hidden" for="{{ formset.empty_form.weekday.id_for_label }}">Jour</label>
+          {{ formset.empty_form.weekday }}
+        </td>
+        <td>
+          <label class="sm-visually-hidden" for="{{ formset.empty_form.start_time.id_for_label }}">Heure de début</label>
+          {{ formset.empty_form.start_time }}
+        </td>
+        <td>
+          <label class="sm-visually-hidden" for="{{ formset.empty_form.end_time.id_for_label }}">Heure de fin</label>
+          {{ formset.empty_form.end_time }}
+        </td>
+        <td>
+          <label class="sm-check sm-check--compact" for="{{ formset.empty_form.is_active.id_for_label }}">
+            {{ formset.empty_form.is_active }}
+            <span class="sm-visually-hidden">Plage active</span>
+          </label>
+        </td>
+        <td>{{ formset.empty_form.id }}</td>
+      </tr>
+    </template>
+  </div>
+
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <div>
+        <h2 class="sm-panel__title">Exceptions</h2>
+        <p class="sm-panel__text">Bloquez une journée entière ou une plage précise. Laissez les heures vides pour un jour off.</p>
+      </div>
+    </div>
+
+    <form class="sm-form sm-form--inline" method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add_exception">
+      {% if exception_form.non_field_errors %}
+        <div class="sm-form__error" role="alert">{{ exception_form.non_field_errors }}</div>
+      {% endif %}
+      <div class="sm-form__row">
+        {% include "partials/_form_field.html" with field=exception_form.date %}
+        {% include "partials/_form_field.html" with field=exception_form.start_time %}
+        {% include "partials/_form_field.html" with field=exception_form.end_time %}
+      </div>
+      {% include "partials/_form_field.html" with field=exception_form.reason %}
+      <div class="sm-form__actions">
+        <button class="sm-btn sm-btn--primary" type="submit">Ajouter l'exception</button>
+      </div>
+    </form>
+
+    {% if exceptions %}
+      <div class="sm-table-wrap">
+        <table class="sm-table">
+          <caption class="sm-visually-hidden">Exceptions de disponibilité à venir</caption>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Plage</th>
+              <th scope="col">Motif</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for exception in exceptions %}
+              <tr>
+                <td>{{ exception.date|date:"d/m/Y" }}</td>
+                <td>
+                  {% if exception.is_full_day %}Journée entière{% else %}
+                    {{ exception.start_time|time:"H:i" }}–{{ exception.end_time|time:"H:i" }}
+                  {% endif %}
+                </td>
+                <td>{{ exception.reason|default:"—" }}</td>
+                <td>
+                  <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete_exception">
+                    <input type="hidden" name="exception_id" value="{{ exception.pk }}">
+                    <button class="sm-btn sm-btn--ghost sm-btn--small" type="submit">Supprimer</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="sm-field__help">Aucune exception à venir.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const addButton = document.getElementById("add-schedule-row");
+    const rows = document.getElementById("schedule-rows");
+    const template = document.getElementById("empty-schedule-row");
+    const totalForms = document.getElementById("id_form-TOTAL_FORMS");
+    if (!addButton || !rows || !template || !totalForms) return;
+
+    addButton.addEventListener("click", function () {
+      const index = Number(totalForms.value);
+      const markup = template.innerHTML.replace(/__prefix__/g, String(index));
+      rows.insertAdjacentHTML("beforeend", markup);
+      totalForms.value = String(index + 1);
+      const addedRow = rows.lastElementChild;
+      const firstField = addedRow && addedRow.querySelector("select, input");
+      if (firstField) firstField.focus();
+    });
+  })();
+</script>
+{% endblock %}

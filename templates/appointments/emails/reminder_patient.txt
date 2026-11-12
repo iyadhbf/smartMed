@@ -1,0 +1,10 @@
+Bonjour {{ patient.first_name }},
+
+Rappel : vous avez un rendez-vous demain.
+
+Médecin : {{ doctor.display_name }} ({{ doctor.specialty.name }})
+Date : {{ appointment.date|date:"l j F Y" }} à {{ appointment.start_time|time:"H:i" }}
+
+En cas d'empêchement, pensez à l'annuler depuis votre espace personnel.
+
+SmartMed AI — message automatique, données de démonstration fictives.

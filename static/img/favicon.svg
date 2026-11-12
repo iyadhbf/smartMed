@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="SmartMed AI">
+  <defs>
+    <linearGradient id="smartmed-favicon" x1="6" y1="4" x2="44" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#66C9D5"/>
+      <stop offset=".55" stop-color="#4FB3C1"/>
+      <stop offset="1" stop-color="#2E8FA3"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="12" fill="url(#smartmed-favicon)"/>
+  <path d="M20.5 11.5h7v9h9v7h-9v9h-7v-9h-9v-7h9z" fill="#fff"/>
+  <path d="M38 7.5l1.35 3.65L43 12.5l-3.65 1.35L38 17.5l-1.35-3.65L33 12.5l3.65-1.35z" fill="#F2FDFF"/>
+</svg>

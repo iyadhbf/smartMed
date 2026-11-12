@@ -1,0 +1,223 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Dossier de {{ record.patient.user.full_name }} — SmartMed AI{% endblock %}
+{% block meta_description %}Dossier médical d'un patient autorisé : informations de santé, consultations, ordonnances et documents.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/records.css' %}">
+{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link" href="{% url 'doctor_dashboard' %}">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_agenda' %}">
+    <i class="bi bi-calendar2-week" aria-hidden="true"></i> Mes rendez-vous
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_availability' %}">
+    <i class="bi bi-clock-history" aria-hidden="true"></i> Mes disponibilités
+  </a>
+  <a class="sm-dash__nav-link is-active" href="{% url 'records:doctor_patients' %}" aria-current="page">
+    <i class="bi bi-people" aria-hidden="true"></i> Mes patients
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Dossier patient{% endblock %}
+{% block dash_title %}{{ record.patient.user.full_name }}{% endblock %}
+{% block dash_lead %}{{ record.patient.birth_date|date:"j F Y"|default:"Date de naissance non renseignée" }} — {{ record.patient.user.email }}{% endblock %}
+
+{% block dash_content %}
+<div class="sm-dash__grid">
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Informations de santé</h2>
+    </div>
+    <form class="sm-form" method="post" action="{% url 'records:doctor_patient_record' record.patient.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="form_kind" value="summary">
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ summary_form.history.id_for_label }}">Antécédents</label>
+          {{ summary_form.history }}
+        </div>
+      </div>
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ summary_form.allergies.id_for_label }}">Allergies</label>
+          {{ summary_form.allergies }}
+        </div>
+      </div>
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ summary_form.treatments.id_for_label }}">Traitements en cours</label>
+          {{ summary_form.treatments }}
+        </div>
+      </div>
+      <div class="sm-form__actions">
+        <button class="sm-btn sm-btn--primary" type="submit">Enregistrer le dossier</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Nouvelle consultation</h2>
+    </div>
+    <form class="sm-form" method="post" action="{% url 'records:doctor_patient_record' record.patient.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="form_kind" value="consultation">
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ consultation_form.occurred_at.id_for_label }}">Date de la consultation</label>
+          {{ consultation_form.occurred_at }}
+        </div>
+      </div>
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ consultation_form.appointment.id_for_label }}">Rendez-vous associé (optionnel)</label>
+          {{ consultation_form.appointment }}
+        </div>
+      </div>
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ consultation_form.report.id_for_label }}">Compte rendu</label>
+          {{ consultation_form.report }}
+        </div>
+      </div>
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ consultation_form.prescription_content.id_for_label }}">Ordonnance (optionnel)</label>
+          {{ consultation_form.prescription_content }}
+        </div>
+      </div>
+      <div class="sm-form__actions">
+        <button class="sm-btn sm-btn--primary" type="submit">Enregistrer la consultation</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Ajouter un document</h2>
+    </div>
+    <p class="sm-panel__text">PDF, JPG ou PNG, 5 Mo maximum.</p>
+    <form class="sm-form" method="post" action="{% url 'records:doctor_patient_record' record.patient.pk %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="form_kind" value="document">
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ document_form.document_type.id_for_label }}">Type</label>
+          {{ document_form.document_type }}
+        </div>
+      </div>
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ document_form.title.id_for_label }}">Titre (optionnel)</label>
+          {{ document_form.title }}
+        </div>
+      </div>
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ document_form.consultation.id_for_label }}">Consultation associée (optionnel)</label>
+          {{ document_form.consultation }}
+        </div>
+      </div>
+      <div class="sm-form__row">
+        <div class="sm-field">
+          <label class="sm-field__label" for="{{ document_form.file.id_for_label }}">Fichier</label>
+          {{ document_form.file }}
+        </div>
+      </div>
+      <div class="sm-form__actions">
+        <button class="sm-btn sm-btn--primary" type="submit">Ajouter le document</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="sm-panel sm-panel--wide">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Consultations</h2>
+      <span class="sm-pill">{{ consultations|length }} consultation{{ consultations|length|pluralize }}</span>
+    </div>
+    {% if consultations %}
+      <ul class="record-list">
+        {% for consultation in consultations %}
+          <li class="record-item">
+            <div class="record-item__head">
+              <p class="record-item__title">{{ consultation.occurred_at|date:"l j F Y à H:i" }}</p>
+              <p class="record-item__meta">
+                {% if consultation.appointment %}Rendez-vous du {{ consultation.appointment.date|date:"j F Y" }}{% else %}Hors rendez-vous{% endif %}
+              </p>
+            </div>
+            <div class="record-item__body">
+              <p>{{ consultation.report|linebreaksbr }}</p>
+            </div>
+            {% for prescription in consultation.prescriptions.all %}
+              <div class="record-prescription">
+                <p class="record-prescription__title">
+                  <i class="bi bi-file-earmark-medical" aria-hidden="true"></i>
+                  Ordonnance du {{ prescription.issued_on|date:"j F Y" }}
+                </p>
+                <p>{{ prescription.content|linebreaksbr }}</p>
+              </div>
+            {% endfor %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+        <p>Aucune consultation enregistrée.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="sm-panel sm-panel--wide">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Documents du patient</h2>
+      <span class="sm-pill">{{ paginator.count }} document{{ paginator.count|pluralize }}</span>
+    </div>
+    {% if documents %}
+      <ul class="record-list record-list--documents">
+        {% for document in documents %}
+          <li class="record-doc">
+            <div class="record-doc__info">
+              <p class="record-doc__name">
+                <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+                {{ document.display_name }}
+              </p>
+              <p class="record-doc__meta">
+                {{ document.get_document_type_display }} · ajouté le {{ document.created_at|date:"j F Y" }}
+              </p>
+            </div>
+            <a class="sm-btn sm-btn--ghost sm-btn--small" href="{% url 'records:document_download' document.pk %}">
+              <i class="bi bi-download" aria-hidden="true"></i> Télécharger
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+      {% if is_paginated %}
+        <nav class="sm-pagination" aria-label="Pagination des documents">
+          {% if page_obj.has_previous %}
+            <a class="sm-pagination__link" href="?page={{ page_obj.previous_page_number }}" rel="prev">Précédent</a>
+          {% else %}
+            <span class="sm-pagination__link is-disabled" aria-disabled="true">Précédent</span>
+          {% endif %}
+          <p class="sm-pagination__status">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+          {% if page_obj.has_next %}
+            <a class="sm-pagination__link" href="?page={{ page_obj.next_page_number }}" rel="next">Suivant</a>
+          {% else %}
+            <span class="sm-pagination__link is-disabled" aria-disabled="true">Suivant</span>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-folder2-open" aria-hidden="true"></i>
+        <p>Aucun document dans ce dossier.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

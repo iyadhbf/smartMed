@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block title %}Accès refusé — SmartMed AI{% endblock %}
+
+{% block content %}
+  {% include "errors/_card.html" with code="403" icon="shield-lock" title="Accès refusé" message="Vous n'avez pas les droits nécessaires pour accéder à cette page. Si vous pensez qu'il s'agit d'une erreur, contactez l'administrateur de la plateforme." %}
+{% endblock %}

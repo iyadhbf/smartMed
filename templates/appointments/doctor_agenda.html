@@ -1,0 +1,131 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Mes rendez-vous — SmartMed AI{% endblock %}
+{% block meta_description %}Votre agenda de consultations SmartMed AI.{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/appointments.css' %}">{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link" href="{% url 'doctor_dashboard' %}">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link is-active" href="{% url 'doctor_agenda' %}" aria-current="page">
+    <i class="bi bi-calendar2-week" aria-hidden="true"></i> Mes rendez-vous
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'doctor_availability' %}">
+    <i class="bi bi-calendar3" aria-hidden="true"></i> Mes disponibilités
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Espace médecin{% endblock %}
+{% block dash_title %}Mes rendez-vous{% endblock %}
+{% block dash_lead %}Votre agenda : confirmez les demandes, terminez les consultations passées et annulez si nécessaire.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-stack">
+  <div class="sm-stat-grid">
+    <div class="sm-stat">
+      <p class="sm-stat__value">{{ today_appointments|length }}</p>
+      <p class="sm-stat__label">Rendez-vous aujourd'hui</p>
+    </div>
+    <div class="sm-stat">
+      <p class="sm-stat__value">{{ pending_count }}</p>
+      <p class="sm-stat__label">Demandes en attente</p>
+    </div>
+    <div class="sm-stat">
+      <p class="sm-stat__value">{{ upcoming_appointments|length }}</p>
+      <p class="sm-stat__label">À venir (après aujourd'hui)</p>
+    </div>
+  </div>
+
+  <div class="sm-panel sm-panel--wide">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Aujourd'hui</h2>
+    </div>
+    {% if today_appointments %}
+      <ul class="appt-list">
+        {% for appointment in today_appointments %}
+          {% include "appointments/_doctor_agenda_row.html" %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+        <p>Aucun rendez-vous aujourd'hui.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="sm-panel sm-panel--wide">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">À venir</h2>
+    </div>
+    {% if upcoming_appointments %}
+      <ul class="appt-list">
+        {% for appointment in upcoming_appointments %}
+          {% include "appointments/_doctor_agenda_row.html" %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-calendar2-week" aria-hidden="true"></i>
+        <p>Aucun rendez-vous à venir.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="sm-panel sm-panel--wide">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Historique</h2>
+    </div>
+    {% if past_appointments %}
+      <div class="sm-table-wrap">
+        <table class="sm-table">
+          <caption class="sm-visually-hidden">Historique de vos rendez-vous</caption>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Heure</th>
+              <th scope="col">Patient</th>
+              <th scope="col">Motif</th>
+              <th scope="col">Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appointment in past_appointments %}
+              <tr>
+                <td>{{ appointment.date|date:"d/m/Y" }}</td>
+                <td>{{ appointment.start_time|time:"H:i" }}</td>
+                <td>{{ appointment.patient.full_name }}</td>
+                <td>{{ appointment.reason|default:"—" }}</td>
+                <td><span class="sm-pill sm-pill--{{ appointment.status }}">{{ appointment.get_status_display }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if is_paginated %}
+        <nav class="sm-pagination" aria-label="Pagination de l'historique">
+          {% if page_obj.has_previous %}
+            <a class="sm-pagination__link" href="?page={{ page_obj.previous_page_number }}" rel="prev">Précédent</a>
+          {% else %}
+            <span class="sm-pagination__link is-disabled" aria-disabled="true">Précédent</span>
+          {% endif %}
+          <p class="sm-pagination__status">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+          {% if page_obj.has_next %}
+            <a class="sm-pagination__link" href="?page={{ page_obj.next_page_number }}" rel="next">Suivant</a>
+          {% else %}
+            <span class="sm-pagination__link is-disabled" aria-disabled="true">Suivant</span>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-clock-history" aria-hidden="true"></i>
+        <p>Aucun rendez-vous passé.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

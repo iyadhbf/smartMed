@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Déplacer mon rendez-vous — SmartMed AI{% endblock %}
+{% block meta_description %}Choisissez un nouveau créneau pour votre rendez-vous SmartMed AI.{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/appointments.css' %}">{% endblock %}
+
+{% block content %}
+<section class="sm-page">
+  <div class="sm-container sm-container--narrow">
+    <div class="sm-page__head">
+      <p class="sm-eyebrow">Prise de rendez-vous</p>
+      <h1 class="sm-page__title">Déplacer mon rendez-vous</h1>
+      <p class="sm-page__lead">Rendez-vous actuel : {{ appointment.doctor.display_name }},
+        le {{ appointment.date|date:"l j F Y" }} à {{ appointment.start_time|time:"H:i" }}.</p>
+    </div>
+
+    {% if can_change %}
+      {% if slot_days %}
+        <form method="post" class="booking-slots-form">
+          {% csrf_token %}
+          <p class="booking-slots-form__count">Choisissez un nouveau créneau chez {{ appointment.doctor.display_name }}.</p>
+          {% include "appointments/_slot_picker.html" with wanted_date=None required=True %}
+          <div class="sm-form__actions">
+            <button class="sm-btn sm-btn--primary" type="submit">Déplacer vers ce créneau</button>
+            <a class="sm-btn sm-btn--ghost" href="{% url 'appointments:appointment_list' %}">Retour à mes rendez-vous</a>
+          </div>
+        </form>
+      {% else %}
+        <div class="sm-empty">
+          <i class="bi bi-calendar2-x" aria-hidden="true"></i>
+          <p>Aucun autre créneau libre sur les 14 prochains jours chez ce médecin.</p>
+          <a class="sm-btn sm-btn--ghost" href="{% url 'appointments:appointment_list' %}">Retour à mes rendez-vous</a>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="sm-callout">
+        Ce rendez-vous a lieu dans moins de 2 heures et ne peut plus être déplacé en ligne.
+        Contactez le centre au +216 71 000 000.
+      </div>
+      <div class="sm-form__actions">
+        <a class="sm-btn sm-btn--ghost" href="{% url 'appointments:appointment_list' %}">Retour à mes rendez-vous</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

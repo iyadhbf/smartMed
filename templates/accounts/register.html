@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un compte patient — SmartMed AI{% endblock %}
+{% block meta_description %}Créez votre compte patient SmartMed AI pour préparer vos rendez-vous et accéder à votre espace personnel sécurisé.{% endblock %}
+{% block body_class %}auth{% endblock %}
+
+{% block content %}
+<section class="sm-page sm-page--auth">
+  <div class="sm-container">
+    <div class="sm-auth sm-auth--wide">
+      <div class="sm-auth__card">
+        <div class="sm-auth__head">
+          <span class="sm-auth__icon" aria-hidden="true"><i class="bi bi-person-plus"></i></span>
+          <h1 class="sm-auth__title">Créer votre compte patient</h1>
+          <p class="sm-auth__sub">Quelques informations suffisent pour préparer votre première consultation.</p>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="sm-form__error" role="alert">
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+
+        <form class="sm-form" method="post" action="{% url 'accounts:register' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+
+          <div class="sm-form__row">
+            {% include "partials/_form_field.html" with field=form.first_name %}
+            {% include "partials/_form_field.html" with field=form.last_name %}
+          </div>
+          {% include "partials/_form_field.html" with field=form.email %}
+          <div class="sm-form__row">
+            {% include "partials/_form_field.html" with field=form.birth_date %}
+            {% include "partials/_form_field.html" with field=form.phone %}
+          </div>
+          {% include "partials/_form_field.html" with field=form.password1 %}
+          {% include "partials/_form_field.html" with field=form.password2 %}
+
+          <div class="sm-field{% if form.consent.errors %} has-error{% endif %}">
+            <label class="sm-check" for="{{ form.consent.id_for_label }}">
+              {{ form.consent }}
+              <span>J'ai lu et j'accepte la <a href="{% url 'privacy' %}" target="_blank" rel="noopener">politique de confidentialité</a> et le traitement de mes données personnelles dans le cadre de cette plateforme de démonstration.</span>
+            </label>
+            {% for error in form.consent.errors %}<p class="sm-field__error">{{ error }}</p>{% endfor %}
+          </div>
+
+          <button class="sm-btn sm-btn--primary sm-btn--block" type="submit">
+            Créer mon compte <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </button>
+        </form>
+
+        <p class="sm-auth__foot">
+          Déjà un compte ?
+          <a href="{% url 'accounts:login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Se connecter</a><br>
+          <a href="{% url 'home' %}">Retour à l'accueil</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

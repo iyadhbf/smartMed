@@ -1,0 +1,13 @@
+Bonjour {{ patient.first_name }},
+
+Votre demande de rendez-vous a bien été enregistrée.
+
+Médecin : {{ doctor.display_name }} ({{ doctor.specialty.name }})
+Date : {{ appointment.date|date:"l j F Y" }} à {{ appointment.start_time|time:"H:i" }}
+Motif : {% if appointment.reason %}{{ appointment.reason }}{% else %}Non précisé{% endif %}
+Statut : en attente de confirmation par le médecin.
+
+Vous pouvez annuler ou déplacer ce rendez-vous depuis votre espace personnel
+tant qu'il reste plus de 2 heures avant le début.
+
+SmartMed AI — message automatique, données de démonstration fictives.

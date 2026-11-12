@@ -1,0 +1,11 @@
+Bonjour Dr {{ doctor.user.last_name }},
+
+Une nouvelle demande de rendez-vous vient d'être enregistrée.
+
+Patient : {{ patient.full_name }}
+Date : {{ appointment.date|date:"l j F Y" }} à {{ appointment.start_time|time:"H:i" }}
+Motif : {% if appointment.reason %}{{ appointment.reason }}{% else %}Non précisé{% endif %}
+
+Rendez-vous dans votre espace médecin pour confirmer ou annuler.
+
+SmartMed AI — message automatique, données de démonstration fictives.

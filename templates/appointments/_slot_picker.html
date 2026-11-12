@@ -1,0 +1,29 @@
+<div class="slot-picker">
+  {% for day in slot_days %}
+    <fieldset class="slot-day{% if wanted_date == day.date %} is-wanted{% endif %}">
+      <legend class="slot-day__legend">
+        {{ day.label }}
+        {% if wanted_date == day.date %}<span class="sm-pill">Date souhaitée</span>{% endif %}
+      </legend>
+      <div class="slot-day__times">
+        {% for slot in day.slots %}
+          <label class="slot-chip">
+            <input
+              class="slot-chip__input"
+              type="radio"
+              name="slot_id"
+              value="{{ slot.pk }}"
+              {% if required %}required{% endif %}
+            >
+            <span class="slot-chip__time">{{ slot.start_time|time:"H:i" }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+  {% empty %}
+    <div class="sm-empty">
+      <i class="bi bi-calendar2-x" aria-hidden="true"></i>
+      <p>Aucun créneau libre sur les 14 prochains jours pour ce médecin.</p>
+    </div>
+  {% endfor %}
+</div>

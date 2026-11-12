@@ -1,0 +1,10 @@
+Bonjour {{ patient.first_name }},
+
+Votre rendez-vous est confirmé.
+
+Médecin : {{ doctor.display_name }} ({{ doctor.specialty.name }})
+Date : {{ appointment.date|date:"l j F Y" }} à {{ appointment.start_time|time:"H:i" }}
+
+À bientôt au centre SmartMed AI.
+
+SmartMed AI — message automatique, données de démonstration fictives.

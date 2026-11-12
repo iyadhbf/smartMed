@@ -1,0 +1,136 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Médecins — Administration — SmartMed AI{% endblock %}
+{% block meta_description %}Liste, recherche et désactivation des comptes médecins SmartMed AI.{% endblock %}
+
+{% block sidebar_nav %}
+  <a class="sm-dash__nav-link" href="{% url 'admin_dashboard' %}">
+    <i class="bi bi-grid" aria-hidden="true"></i> Tableau de bord
+  </a>
+  <a class="sm-dash__nav-link is-active" href="{% url 'doctor_admin_list' %}" aria-current="page">
+    <i class="bi bi-person-badge" aria-hidden="true"></i> Médecins
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'specialty_admin_list' %}">
+    <i class="bi bi-heart-pulse" aria-hidden="true"></i> Spécialités
+  </a>
+  <a class="sm-dash__nav-link" href="{% url 'admin:index' %}">
+    <i class="bi bi-sliders" aria-hidden="true"></i> Administration Django
+  </a>
+{% endblock %}
+
+{% block dash_eyebrow %}Administration{% endblock %}
+{% block dash_title %}Médecins{% endblock %}
+{% block dash_lead %}Gérez les comptes professionnels. Un médecin désactivé disparaît de la recherche sans perdre son historique.{% endblock %}
+
+{% block dash_content %}
+<div class="sm-stack">
+  <div class="sm-panel">
+    <div class="sm-panel__head">
+      <h2 class="sm-panel__title">Comptes médecins</h2>
+      <a class="sm-btn sm-btn--primary" href="{% url 'doctor_create' %}">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> Créer un médecin
+      </a>
+    </div>
+
+    <form class="sm-filter-bar sm-filter-bar--compact" method="get" role="search">
+      <div class="sm-filter-grid sm-filter-grid--three">
+        <div class="sm-field">
+          <label class="sm-field__label" for="doctor-admin-search">Rechercher</label>
+          <input class="form-control" type="search" id="doctor-admin-search" name="q" value="{{ query }}" placeholder="Nom, e-mail ou n° professionnel">
+        </div>
+        <div class="sm-field">
+          <label class="sm-field__label" for="doctor-admin-specialty">Spécialité</label>
+          <select class="form-select" id="doctor-admin-specialty" name="specialty">
+            <option value="">Toutes</option>
+            {% for specialty in specialties %}
+              <option value="{{ specialty.pk }}"{% if selected_specialty == specialty.pk|stringformat:"s" %} selected{% endif %}>{{ specialty.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="sm-field">
+          <label class="sm-field__label" for="doctor-admin-status">Statut</label>
+          <select class="form-select" id="doctor-admin-status" name="status">
+            <option value="">Tous</option>
+            <option value="active"{% if status == "active" %} selected{% endif %}>Actifs</option>
+            <option value="inactive"{% if status == "inactive" %} selected{% endif %}>Désactivés</option>
+          </select>
+        </div>
+        <div class="sm-filter-grid__actions">
+          <button class="sm-btn sm-btn--primary" type="submit">Filtrer</button>
+          {% if query or selected_specialty or status %}
+            <a class="sm-btn sm-btn--ghost" href="{% url 'doctor_admin_list' %}">Réinitialiser</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+    {% if doctors %}
+      <div class="sm-table-wrap">
+        <table class="sm-table">
+          <caption class="sm-visually-hidden">Comptes médecins de la plateforme</caption>
+          <thead>
+            <tr>
+              <th scope="col">Médecin</th>
+              <th scope="col">Spécialité</th>
+              <th scope="col">N° professionnel</th>
+              <th scope="col">Durée</th>
+              <th scope="col">Statut</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doctor in doctors %}
+              <tr>
+                <td>
+                  <strong>{{ doctor.display_name }}</strong>
+                  <span class="sm-table__sub">{{ doctor.user.email }}</span>
+                </td>
+                <td>{{ doctor.specialty.name }}</td>
+                <td>{{ doctor.professional_number }}</td>
+                <td>{{ doctor.consultation_duration }} min</td>
+                <td>
+                  {% if doctor.is_active and doctor.user.is_active %}
+                    <span class="sm-pill sm-pill--ok">Actif</span>
+                  {% else %}
+                    <span class="sm-pill sm-pill--muted">Désactivé</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="sm-table__actions">
+                    <a class="sm-btn sm-btn--ghost sm-btn--small" href="{% url 'doctor_edit' doctor.pk %}">Modifier</a>
+                    <a class="sm-btn sm-btn--ghost sm-btn--small" href="{% url 'doctor_public' doctor.pk %}">Voir la fiche</a>
+                    <form method="post" action="{% url 'doctor_toggle_status' doctor.pk %}">
+                      {% csrf_token %}
+                      <button class="sm-btn sm-btn--ghost sm-btn--small{% if doctor.is_active %} sm-btn--danger{% endif %}" type="submit">
+                        {% if doctor.is_active %}Désactiver{% else %}Réactiver{% endif %}
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if is_paginated %}
+        <nav class="sm-pagination" aria-label="Pagination des médecins">
+          {% if page_obj.has_previous %}
+            <a class="sm-pagination__link" href="{% querystring page=page_obj.previous_page_number %}">Précédent</a>
+          {% endif %}
+          <p class="sm-pagination__status">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+          {% if page_obj.has_next %}
+            <a class="sm-pagination__link" href="{% querystring page=page_obj.next_page_number %}">Suivant</a>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <div class="sm-empty">
+        <i class="bi bi-person-badge" aria-hidden="true"></i>
+        <p>Aucun médecin ne correspond à ces critères.</p>
+        <a class="sm-btn sm-btn--ghost" href="{% url 'doctor_admin_list' %}">Effacer les filtres</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

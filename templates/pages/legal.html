@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Mentions légales — SmartMed AI{% endblock %}
+{% block meta_description %}Informations légales et avertissement médical de la plateforme SmartMed AI.{% endblock %}
+
+{% block content %}
+<section class="sm-page">
+  <div class="sm-container">
+    <div class="sm-page__head">
+      <p class="sm-eyebrow">Informations légales</p>
+      <h1 class="sm-page__title">Mentions légales</h1>
+      <p class="sm-page__lead">Informations relatives à l'édition, à l'hébergement et à l'utilisation de la plateforme.</p>
+    </div>
+
+    <div class="sm-prose">
+      <h2>Éditeur</h2>
+      <p>SmartMed AI est un projet académique réalisé dans le cadre du cours « Projet de développement ». Il ne constitue pas un service médical commercial. Contact : <a href="mailto:contact@smartmed.test">contact@smartmed.test</a>.</p>
+
+      <h2>Hébergement</h2>
+      <p>L'hébergement de la version de démonstration sera précisé lors du déploiement. Les données présentées sur ce site sont fictives.</p>
+
+      <h2>Avertissement médical</h2>
+      <div class="sm-callout">
+        SmartMed AI ne fournit aucun diagnostic ni traitement. L'assistant IA délivre des informations générales, sourcées et ne remplace en aucun cas une consultation. En cas d'urgence, contactez immédiatement les services d'urgence locaux.
+      </div>
+
+      <h2>Propriété intellectuelle</h2>
+      <p>Le nom, l'interface et les contenus de démonstration sont produits pour ce projet. Les photographies utilisées sont des visuels de démonstration générés pour l'occasion. Toute réutilisation hors du cadre pédagogique doit être autorisée.</p>
+
+      <h2>Responsabilité</h2>
+      <p>L'équipe projet s'efforce de maintenir des informations exactes et un service disponible, sans garantie. Les décisions médicales doivent toujours être prises avec un professionnel de santé qualifié.</p>
+
+      <h2>Données personnelles</h2>
+      <p>Le traitement des données est décrit dans la <a href="{% url 'privacy' %}">politique de confidentialité</a>.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}
